@@ -6,7 +6,7 @@ public class InputManager : MonoBehaviour
 {
     public static InputManager instance;
 
-    private Inputs_Player inputPlayer;
+    //private Inputs_Player inputPlayer;
 
     private void Awake()
     {
@@ -20,46 +20,46 @@ public class InputManager : MonoBehaviour
             Destroy(this);
         }
 
-        inputPlayer = new Inputs_Player();
+        //inputPlayer = new Inputs_Player();
     }
 
-    private void OnEnable()
-    {
-        inputPlayer.Enable();
-    }
+    //private void OnEnable()
+    //{
+    //    inputPlayer.Enable();
+    //}
 
-    private void OnDisable()
-    {
-        inputPlayer.Disable();
-    }
+    //private void OnDisable()
+    //{
+    //    inputPlayer.Disable();
+    //}
 
-    public Vector2 GetPlayerMovement()
-    {
-        return inputPlayer.Player.Movement.ReadValue<Vector2>();
-    }
+    //public Vector2 GetPlayerMovement()
+    //{
+    //    return inputPlayer.Player.Movement.ReadValue<Vector2>();
+    //}
 
-    public Vector2 GetMouseDelta()
-    {
-        return inputPlayer.Player.Look.ReadValue<Vector2>();
-    }
+    //public Vector2 GetMouseDelta()
+    //{
+    //    return inputPlayer.Player.Look.ReadValue<Vector2>();
+    //}
 
-    public bool GetPlayerJump()
-    {
-        return inputPlayer.Player.Jump.triggered;
-    }
+    //public bool GetPlayerJump()
+    //{
+    //    return inputPlayer.Player.Jump.triggered;
+    //}
 
-    public bool GetPlayerEscapeKey()
-    {
-        return inputPlayer.Player.EscapeKey.triggered;
-    }
+    //public bool GetPlayerEscapeKey()
+    //{
+    //    return inputPlayer.Player.EscapeKey.triggered;
+    //}
 
-    public bool GetPlayerShoot()
-    {
-        return inputPlayer.Player.Shoot.triggered;
-    }
+    //public bool GetPlayerShoot()
+    //{
+    //    return inputPlayer.Player.Shoot.triggered;
+    //}
 
-    public bool GetPlayerReload()
-    {
-        return inputPlayer.Player.Reload.triggered;
-    }
+    //public bool GetPlayerReload()
+    //{
+    //    return inputPlayer.Player.Reload.triggered;
+    //}
 }
