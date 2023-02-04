@@ -6,8 +6,12 @@ using TMPro;
 
 public class GameManager : MonoBehaviour
 {
+    [SerializeField]
+    GameObject GameManagerUI;
+
     enum GameState
     {
+        STARTMENU,
         ASSIGNING_PLAYERS,
         SELECTING_SABOTEUR,
         GAMEPLAY,
@@ -25,7 +29,7 @@ public class GameManager : MonoBehaviour
     public GameObject mapPrefab;
 
     List<Player> players = new List<Player>();
-    GameState currentGameState = GameState.ASSIGNING_PLAYERS;
+    GameState currentGameState = GameState.STARTMENU;
     float currentWaitTime = 0f;
     int currentSaboteurSelectionPlayer = 0;
     int currentGameplayPlayer = 0;
@@ -39,8 +43,9 @@ public class GameManager : MonoBehaviour
     public string CloseingEyes;
     public string ImpostorDisplay;
     TextMeshProUGUI PlayerMessage_text;
-    
 
+    int PLAYERNUMBER_MAX = 4;
+    public int PlayerMaxNumber { get { return PLAYERNUMBER_MAX; } }
     int[] playerOrder;
     GameObject mapObject;
     Map map;
@@ -48,10 +53,35 @@ public class GameManager : MonoBehaviour
     int currentPositionY;
     int totalMoves = 30;
 
+    public static GameManager instance;
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else if (instance != null)
+        {
+            Debug.Log("Instance already exists, destroying object !");
+            Destroy(this);
+        }
+    }
+
     // Start is called before the first frame update
     void Start()
     {
         PlayerMessage_text = PlayerMessage.GetComponent<TextMeshProUGUI>();
+    }
+
+    public void StartPlayerSelection()
+    {
+        currentGameState = GameState.ASSIGNING_PLAYERS;
+    }
+
+    public void StartGame()
+    {
+        currentGameState = GameState.SELECTING_SABOTEUR;
+        GameManagerUI.SetActive(true);
     }
 
     int[] GetRandomOrder()
@@ -82,57 +112,33 @@ public class GameManager : MonoBehaviour
         Destroy(mapObject);
     }
 
+    public int GetCurrentPlayerNumber()
+    {
+        return players.Count;
+    }
+
+    public void AddNewPlayer(int joypadNumber)
+    {
+        Player newPlayer = new Player();
+        newPlayer.number = players.Count + 1;
+        newPlayer.joypad = joypadNumber;
+        players.Add(newPlayer);
+
+        PlayerSelected(newPlayer.number);
+    }
+
+    private void PlayerSelected(int playerNumber)
+    {
+        Debug.Log("Player " + playerNumber + " Selected!");
+    }
+
     // Update is called once per frame
     void Update()
     {
         float originX = -2.5f;
         float originY = -2f;
 
-        if (currentGameState == GameState.ASSIGNING_PLAYERS)
-        {
-            int currPlayerBeingAssigned = players.Count + 1;
-            bool selectedAPlayer = false;
-
-            if (Input.GetKeyDown("joystick 1 button 0"))
-            {
-                Player newPlayer = new Player();
-                newPlayer.number = currPlayerBeingAssigned;
-                newPlayer.joypad = 1;
-                players.Add(newPlayer);
-                selectedAPlayer = true;
-            }
-            else if (Input.GetKeyDown("joystick 2 button 0"))
-            {
-                Player newPlayer = new Player();
-                newPlayer.number = currPlayerBeingAssigned;
-                newPlayer.joypad = 2;
-                players.Add(newPlayer);
-                selectedAPlayer = true;
-            }
-            else if (Input.GetKeyDown("joystick 3 button 0"))
-            {
-                Player newPlayer = new Player();
-                newPlayer.number = currPlayerBeingAssigned;
-                newPlayer.joypad = 3;
-                players.Add(newPlayer);
-                selectedAPlayer = true;
-            }
-            else if (Input.GetKeyDown("joystick 4 button 0"))
-            {
-                Player newPlayer = new Player();
-                newPlayer.number = currPlayerBeingAssigned;
-                newPlayer.joypad = 4;
-                players.Add(newPlayer);
-                selectedAPlayer = true;
-            }
-
-            if (selectedAPlayer)
-                Debug.Log("Player " + currPlayerBeingAssigned + " Selected!");
-
-            if (players.Count >= 2)
-                currentGameState = GameState.SELECTING_SABOTEUR;
-        }
-        else if (currentGameState == GameState.SELECTING_SABOTEUR)
+        if (currentGameState == GameState.SELECTING_SABOTEUR)
         {
             if (startingSaboteurSelect)
             {
