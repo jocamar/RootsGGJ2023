@@ -93,15 +93,14 @@ public class GameManager : MonoBehaviour
                 Debug.Log("All players close your eyes!");
                 startingSaboteurSelect = false;
                 randomImpostor = Random.Range(0, 4);
+                currentWaitTime = 1.0f;
             }
-
-            currentWaitTime = 1.0f;
 
             currentWaitTime -= Time.deltaTime;
 
             if (currentWaitTime <= 0.0f)
             {
-                Debug.Log("Player " + currentSaboteurSelectionPlayer + 1 + " Open your eyes!");
+                Debug.Log("Player " + (currentSaboteurSelectionPlayer + 1) + " Open your eyes!");
                 
                 if (currentSaboteurSelectionPlayer == randomImpostor)
                     Debug.Log("You are the impostor!");
