@@ -35,6 +35,17 @@
                     "isPartOfComposite": false
                 },
                 {
+                    "name": "",
+                    "id": "ea321090-23a8-413b-8d62-10ea2bf8aa20",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Select",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
                     "name": "Gamepad",
                     "id": "46f4afde-3462-4bcc-b186-658af508a313",
                     "path": "2DVector",

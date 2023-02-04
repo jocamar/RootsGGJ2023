@@ -212,6 +212,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GameManagerUI: {fileID: 4514481677229163857}
+  movement: {fileID: -4247825752905066545, guid: eddcbaba45605c0488d9dc850851d034, type: 3}
+  PlayerInputs: {fileID: 1711849268070526827, guid: 9640b4e797a385347a0c793ca10c2f9c, type: 3}
   emptyTile: {fileID: 2490920004700886794, guid: 6356c9239f7c0744eb3b09b5d45496e5, type: 3}
   obstacleTile: {fileID: 636138372365210398, guid: a0fb166bff5871b4c80e996b530594e5, type: 3}
   startTile: {fileID: 5031278145993736775, guid: 34a20d0c87b1bc0408b084e48911eaf3, type: 3}

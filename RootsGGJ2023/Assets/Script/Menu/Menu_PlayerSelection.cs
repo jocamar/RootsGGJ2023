@@ -21,7 +21,14 @@ public class Menu_PlayerSelection : MonoBehaviour
     [SerializeField]
     Color[] playerSpriteColorsSelection;
 
+    [SerializeField]
+    Image launchGameLoading;
+
+    private float percentageLaunchGame;
+
     private List<Image> playerSprites = new List<Image>();
+
+    private const float TIMETOLAUNCHGAME = 1.5f;
 
     private void Start()
     {
@@ -52,24 +59,35 @@ public class Menu_PlayerSelection : MonoBehaviour
             }
         }
 
-        if (select.action.triggered)
-        {
-            if (GameManager.instance.GetCurrentPlayerNumber() < GameManager.instance.PlayerMaxNumber)
-            {
-                CreateNewPlayer();
+        bool onePlayerIsPressingKey = false;
 
-                UpdatePlayerUI();
-            }
-            else
+        foreach (var player in PlayerInputs.allPlayers)
+        {
+            if (player.playerSelect && GameManager.instance.IsPlayerInputInGame(player))
+                onePlayerIsPressingKey = true;
+
+            if (player.playerSelect_Down)
             {
-                SceneGameManager.instance.StartGameScene();
+                if (!GameManager.instance.IsPlayerInputInGame(player) && GameManager.instance.GetCurrentPlayerNumber() < GameManager.instance.PlayerMaxNumber)
+                {
+                    CreateNewPlayer(player);
+                    UpdatePlayerUI();
+                }
             }
+        }
+
+        percentageLaunchGame = Mathf.MoveTowards(percentageLaunchGame, onePlayerIsPressingKey ? 1 : 0, Time.deltaTime / TIMETOLAUNCHGAME);
+        launchGameLoading.fillAmount = percentageLaunchGame;
+
+        if (percentageLaunchGame == 1)
+        {
+            SceneGameManager.instance.StartGameScene();
         }
     }
 
-    void CreateNewPlayer()
+    void CreateNewPlayer(PlayerInputs player)
     {
-        GameManager.instance.AddNewPlayer(Gamepad.current.deviceId);
+        GameManager.instance.AddNewPlayer(player);
     }
 
     void UpdatePlayerUI()

@@ -13,6 +13,9 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private InputActionReference movement;
 
+    [SerializeField]
+    private GameObject PlayerInputs;
+
     enum GameState
     {
         STARTMENU,
@@ -122,14 +125,17 @@ public class GameManager : MonoBehaviour
         return players.Count;
     }
 
-    public void AddNewPlayer(int joypadNumber)
+    public bool IsPlayerInputInGame(PlayerInputs playerInputs)
     {
-        Player newPlayer = new Player();
-        newPlayer.number = players.Count + 1;
-        newPlayer.joypad = joypadNumber;
+        return players.Find(x => x.playerInputs == playerInputs) != null;
+    }
+
+    public void AddNewPlayer(PlayerInputs playerInput)
+    {
+        Player newPlayer = new Player(playerInput, players.Count + 1);
         players.Add(newPlayer);
 
-        PlayerSelected(newPlayer.number);
+        PlayerSelected(newPlayer.playerIndex);
     }
 
     private void PlayerSelected(int playerNumber)
@@ -258,7 +264,7 @@ public class GameManager : MonoBehaviour
                     }
                 }
 
-                if (Input.GetKeyDown("joystick " + players[playerOrder[currentGameplayPlayer]].joypad + " button 0") || players[playerOrder[currentGameplayPlayer]].movesForCurrentRound.Count >= 3)
+                if (players[playerOrder[currentGameplayPlayer]].playerInputs.playerSelect_Down || players[playerOrder[currentGameplayPlayer]].movesForCurrentRound.Count >= 3)
                 {
                     Debug.Log("Player " + (playerOrder[currentGameplayPlayer] + 1) + " has finished!");
                     currentGameplayPlayer++;
