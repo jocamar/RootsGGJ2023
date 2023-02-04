@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class GrowVineScript : MonoBehaviour
 {
-    public List<MeshRenderer> gorwVinesMeshes;
     public float timeToGrow = 5;
     public float refreshRate = 0.05f;
     [Range(0,1)]
@@ -12,6 +11,7 @@ public class GrowVineScript : MonoBehaviour
     [Range(0,1)]
     public float maxGrow = 0.97f;
 
+    private List<MeshRenderer> growVinesMeshes = new List<MeshRenderer>();
     private List<Material> growVinesMaterials = new List<Material>();
     private bool fullyGrown;
 
@@ -19,12 +19,12 @@ public class GrowVineScript : MonoBehaviour
     {
         for(int i=0; i<growVinesMeshes.Count; i++)
         {
-            for(int j=0; j<growVinesMeshes[i].materials.Lenght; j++)
+            for(int j=0; j<growVinesMeshes[i].materials.Length; j++)
             {
-                if(growVinesMeshes[i].materials[j].Hasproperty("Grow_"))
+                if(growVinesMeshes[i].materials[j].HasProperty("Grow_"))
                 {
                     growVinesMeshes[i].materials[j].SetFloat("Grow_", minGrow);
-                    growVinesMaterials.Add(gorwVinesMeshes[i].materials[j]);
+                    growVinesMaterials.Add(growVinesMeshes[i].materials[j]);
                 }
             }
         }
