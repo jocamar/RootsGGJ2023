@@ -19,14 +19,16 @@ public class GameManager : MonoBehaviour
 
     List<Player> players = new List<Player>();
     GameState currentGameState = GameState.ASSIGNING_PLAYERS;
+
+    //GAME VARIABLES
+    public string CloseingEyes;
+    public string ImpostorDisplay;
     float currentWaitTime = 0f;
     int currentSaboteurSelectionPlayer = 0;
     int randomImpostor = 0;
     bool startingSaboteurSelect = true;
-    public GameObject PlayerMessage;
+    public float Discussion_Time;
 
-    public string CloseingEyes;
-    public string ImpostorDisplay;
     TextMeshProUGUI PlayerMessage_text;
     
 
@@ -122,6 +124,37 @@ public class GameManager : MonoBehaviour
             }
         }
         else if (currentGameState == GameState.GAMEPLAY)
+        {
+
+        }
+        else if (currentGameState == GameState.PATH_REVEAL)
+        {
+
+        }
+        else if (currentGameState == GameState.DISCUSSION)
+        {
+            float timer = Discussion_Time;
+            Timer Discussiontimer = new Timer();
+            {
+                Interval = 1;
+            }
+            Discussiontimer.Enabled = true;
+            Discussiontimer.Tick += new System.EventHandler(OnTimerEvent);
+
+            void OnTimerEvent()
+            {
+                timer = timer--;
+                if (timer == 0)
+                {
+                    currentGameState = GameState.VOTING;
+                }
+            }
+        }
+        else if (currentGameState == GameState.VOTING)
+        {
+
+        }
+        else if (currentGameState == GameState.GAME_END)
         {
 
         }
