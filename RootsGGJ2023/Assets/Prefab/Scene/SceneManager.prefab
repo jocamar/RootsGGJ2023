@@ -43,5 +43,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a187a232f7fc854d966dc2bca0fa6d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scenes:
-  - {fileID: 11400000, guid: c6306c58874bdc844b1a3055a25206f7, type: 2}
+  GameScene: {fileID: 11400000, guid: c6306c58874bdc844b1a3055a25206f7, type: 2}
+  PlayerSelectionScene: {fileID: 11400000, guid: db049df58ba50eb408451ee588a4d6d8, type: 2}
+  MenuStartScene: {fileID: 11400000, guid: 13baa4288d0e03f499af88e732b8da0a, type: 2}
