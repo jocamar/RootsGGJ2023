@@ -15,4 +15,6 @@ public class Player
     public int number;
     public int joypad;
     public List<MoveDirections> movesForCurrentRound = new List<MoveDirections>();
+    public int currentlySelectedVotePlayer = 0;
+    public bool lockedVote = false;
 }
