@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Map
+public class Map : MonoBehaviour
 {
     public enum TileType
     {
@@ -21,16 +21,31 @@ public class Map
     private int width;
     private int height;
     private Tile[,] tiles;
-    private int myStartX;
-    private int myStartY;
+    public int myStartX;
+    public int myStartY;
     private int myEndX;
     private int myEndY;
+    private MonoBehaviour owner;
 
-    public Map(int width, int height)
+    private GameObject[,] objects;
+
+    public void Initialize(MonoBehaviour owner, int width, int height)
     {
         this.width = width;
         this.height = height;
         tiles = new Tile[width, height];
+        objects = new GameObject[width, height];
+        this.owner = owner;
+    }
+
+    public int GetWidth()
+    {
+        return width;
+    }
+
+    public int GetHeight()
+    {
+        return height;
     }
 
     public Tile GetTile(int x, int y)
@@ -47,6 +62,28 @@ public class Map
         if (x >= 0 && x < width && y >= 0 && y < height)
         {
             tiles[x, y] = tile;
+        }
+    }
+
+    public void OnDestroy()
+    {
+        for (int x = 0; x < objects.GetLength(0); x++)
+        {
+            for (int y = 0; y < objects.GetLength(1); y++)
+            {
+                Destroy(objects[x, y]);
+            }
+        }
+    }
+
+    public void SetObject(int x, int y, GameObject tile)
+    {
+        if (x >= 0 && x < width && y >= 0 && y < height)
+        {
+            if (objects[x,y])
+                Destroy(objects[x, y]);
+
+            objects[x, y] = tile;
         }
     }
 
