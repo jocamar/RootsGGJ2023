@@ -155,7 +155,9 @@ MonoBehaviour:
   emptyTile: {fileID: 2490920004700886794, guid: 6356c9239f7c0744eb3b09b5d45496e5, type: 3}
   obstacleTile: {fileID: 636138372365210398, guid: a0fb166bff5871b4c80e996b530594e5, type: 3}
   startTile: {fileID: 5031278145993736775, guid: 34a20d0c87b1bc0408b084e48911eaf3, type: 3}
+  rootTile: {fileID: 7022444042345444852, guid: 7e4bd1ae33ed0ee4cb7aec4f4fe6f769, type: 3}
   endTile: {fileID: 481591026380989032, guid: 42e7cfcaec746514394d91b9bfd75bed, type: 3}
+  mapPrefab: {fileID: 6475806857481846677, guid: 6be47899a72e7ef408977a5ac3dbdb6e, type: 3}
 --- !u!4 &977395106
 Transform:
   m_ObjectHideFlags: 0
