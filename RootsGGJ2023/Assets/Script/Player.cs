@@ -17,6 +17,7 @@ public class Player
 
     public enum MoveDirections
     {
+        NONE,
         UP,
         DOWN,
         LEFT,
