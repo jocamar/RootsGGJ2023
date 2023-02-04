@@ -5,5 +5,5 @@ using UnityEngine.SceneManagement;
 public class ScriptableObject_Scene : ScriptableObject
 {
     [SerializeField]
-    public Scene scene;
+    public string scene;
 }
