@@ -21,7 +21,7 @@ public class GYM_Misc : MonoBehaviour
 
         if (select.action.triggered)
         {
-            Debug.Log(Gamepad.current.deviceId);
+            //Debug.Log(PlayerInputManager.)
         }
     }
 }
