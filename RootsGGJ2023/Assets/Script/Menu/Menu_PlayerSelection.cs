@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class Menu_PlayerSelection : MonoBehaviour
 {
@@ -10,6 +11,22 @@ public class Menu_PlayerSelection : MonoBehaviour
 
     [SerializeField]
     private InputActionReference movement;
+
+    [SerializeField]
+    Transform Root_PlayerSprites;
+
+    [SerializeField]
+    Image playerSprite;
+
+    [SerializeField]
+    Color[] playerSpriteColorsSelection;
+
+    private List<Image> playerSprites = new List<Image>();
+
+    private void Start()
+    {
+        playerSprites.Add(playerSprite);
+    }
 
     void Update()
     {
@@ -40,6 +57,8 @@ public class Menu_PlayerSelection : MonoBehaviour
             if (GameManager.instance.GetCurrentPlayerNumber() < GameManager.instance.PlayerMaxNumber)
             {
                 CreateNewPlayer();
+
+                UpdatePlayerUI();
             }
             else
             {
@@ -51,5 +70,11 @@ public class Menu_PlayerSelection : MonoBehaviour
     void CreateNewPlayer()
     {
         GameManager.instance.AddNewPlayer(1);
+    }
+
+    void UpdatePlayerUI()
+    {
+        int index = GameManager.instance.GetCurrentPlayerNumber();
+        playerSprites.Add(Instantiate(playerSprite, Root_PlayerSprites));
     }
 }
