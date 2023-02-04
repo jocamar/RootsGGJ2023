@@ -41,12 +41,18 @@ public class SceneGameManager : MonoBehaviour
     public void StartPlayerSelectionScene()
     {
         SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName(MenuStartScene.scene));
+
+        GameManager.instance.StartPlayerSelection();
+
         SceneManager.LoadScene(PlayerSelectionScene.scene, LoadSceneMode.Additive);
     }
 
     public void StartGameScene()
     {
         SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName(PlayerSelectionScene.scene));
+
+        GameManager.instance.StartGame();
+
         SceneManager.LoadScene(GameScene.scene, LoadSceneMode.Additive);
     }
 }
