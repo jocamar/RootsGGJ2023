@@ -3,11 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.InputSystem;
 
 public class GameManager : MonoBehaviour
 {
     [SerializeField]
     GameObject GameManagerUI;
+
+    [SerializeField]
+    private InputActionReference movement;
 
     enum GameState
     {
@@ -107,6 +111,7 @@ public class GameManager : MonoBehaviour
         startingGameplayState = true;
         printedPlayerStartMoveMsg = false;
         currentSaboteurSelectionPlayer = 0;
+        currentGameplayPlayer = 0;
         currentGameState = GameState.ASSIGNING_PLAYERS;
         totalMoves = 30;
         Destroy(mapObject);
@@ -227,9 +232,33 @@ public class GameManager : MonoBehaviour
                 {
                     Debug.Log("Player " + (playerOrder[currentGameplayPlayer] + 1) + " make your move!");
                     printedPlayerStartMoveMsg = true;
+                    players[playerOrder[currentGameplayPlayer]].movesForCurrentRound.Clear();
                 }
 
-                if (Input.GetKeyDown("joystick " + players[playerOrder[currentGameplayPlayer]].joypad + " button 0"))
+                if (movement.action.triggered)
+                {
+                    Debug.Log("Triggered move for player " + playerOrder[currentGameplayPlayer] + "!");
+                    switch (movement.action.ReadValue<Vector2>())
+                    {
+                        case Vector2 v when v.Equals(Vector2.up):
+                            players[playerOrder[currentGameplayPlayer]].movesForCurrentRound.Add(Player.MoveDirections.UP);
+                            break;
+
+                        case Vector2 v when v.Equals(Vector2.down):
+                            players[playerOrder[currentGameplayPlayer]].movesForCurrentRound.Add(Player.MoveDirections.DOWN);
+                            break;
+
+                        case Vector2 v when v.Equals(Vector2.left):
+                            players[playerOrder[currentGameplayPlayer]].movesForCurrentRound.Add(Player.MoveDirections.LEFT);
+                            break;
+
+                        case Vector2 v when v.Equals(Vector2.right):
+                            players[playerOrder[currentGameplayPlayer]].movesForCurrentRound.Add(Player.MoveDirections.RIGHT);
+                            break;
+                    }
+                }
+
+                if (Input.GetKeyDown("joystick " + players[playerOrder[currentGameplayPlayer]].joypad + " button 0") || players[playerOrder[currentGameplayPlayer]].movesForCurrentRound.Count >= 3)
                 {
                     Debug.Log("Player " + (playerOrder[currentGameplayPlayer] + 1) + " has finished!");
                     currentGameplayPlayer++;
@@ -244,7 +273,7 @@ public class GameManager : MonoBehaviour
         }
         else if (currentGameState == GameState.PATH_REVEAL)
         {
-            /*List<Player.MoveDirections> completePath = new List<Player.MoveDirections>();
+            List<Player.MoveDirections> completePath = new List<Player.MoveDirections>();
             foreach (int i in playerOrder)
             {
                 completePath.AddRange(players[i].movesForCurrentRound);
@@ -273,7 +302,7 @@ public class GameManager : MonoBehaviour
 
                 if (newX < map.GetWidth() && newX >= 0 && newY >= 0 && newY < map.GetHeight())
                 {
-                    if (map.GetTile(newX, newY).type == Map.TileType.Empty || map.GetTile(newX, newY).type == Map.TileType.End)
+                    if (map.GetTile(newX, newY).type == Map.TileType.Empty)
                     {
                         currentPositionX = newX;
                         currentPositionY = newY;
@@ -284,6 +313,11 @@ public class GameManager : MonoBehaviour
                         var newObj = Instantiate(rootTile, new Vector3(originX + currentPositionX * 0.3f, originY + currentPositionY * 0.3f), Quaternion.identity);
                         map.SetObject(currentPositionX, currentPositionY, newObj);
                     }
+                    else if (map.GetTile(newX, newY).type == Map.TileType.End)
+                    {
+                        Debug.Log("Good guys lost!");
+                        currentGameState = GameState.GAME_END;
+                    }
                 }
 
                 totalMoves--;
@@ -291,8 +325,40 @@ public class GameManager : MonoBehaviour
                 if (totalMoves <= 0)
                 {
                     Debug.Log("Good guys lost!");
+                    currentGameState = GameState.GAME_END;
                 }
-            }*/
+
+                currentGameState = GameState.DISCUSSION;
+                currentWaitTime = 20.0f;
+            }
+        }
+        else if (currentGameState == GameState.DISCUSSION)
+        {
+            Debug.Log("Discuss!");
+            currentWaitTime -= Time.deltaTime;
+
+            if (currentWaitTime <= 0.0f)
+            {
+                currentGameState = GameState.VOTING;
+                currentWaitTime = 10.0f;
+            }
+        }
+        else if (currentGameState == GameState.VOTING)
+        {
+            Debug.Log("Vote!");
+            currentWaitTime -= Time.deltaTime;
+
+            if (currentWaitTime <= 0.0f)
+            {
+                foreach (Player p in players)
+                {
+                    p.movesForCurrentRound.Clear();
+                }
+
+                currentGameState = GameState.GAMEPLAY;
+                startingGameplayState = true;
+                currentGameplayPlayer = 0;
+            }
         }
     }
 }
