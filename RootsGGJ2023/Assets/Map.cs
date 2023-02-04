@@ -29,7 +29,7 @@ public class Map : MonoBehaviour
 
     private GameObject[,] objects;
 
-    public Map(MonoBehaviour owner, int width, int height)
+    public void Initialize(MonoBehaviour owner, int width, int height)
     {
         this.width = width;
         this.height = height;

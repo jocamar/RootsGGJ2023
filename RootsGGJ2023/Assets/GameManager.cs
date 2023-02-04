@@ -51,7 +51,7 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        PlayerMessage_text = PlayerMessage.GetComponent<TextMeshProUGUI>();
     }
 
     int[] GetRandomOrder()
@@ -65,8 +65,6 @@ public class GameManager : MonoBehaviour
             array[randomIndex] = temp;
         }
         return array;
-        PlayerMessage_text = PlayerMessage.GetComponent<TextMeshProUGUI>();
-        
     }
 
     public void Reset()
@@ -169,6 +167,7 @@ public class GameManager : MonoBehaviour
                 {
                     mapObject = Instantiate(mapPrefab);
                     map = mapObject.GetComponent<Map>();
+                    map.Initialize(this, 15, 15);
 
                     map.GenerateMap(10);
 
@@ -235,23 +234,11 @@ public class GameManager : MonoBehaviour
                         currentGameState = GameState.PATH_REVEAL;
                     }
                 }
-
-                if (Input.GetKeyDown("joystick " + players[playerOrder[currentGameplayPlayer]].joypad + " button 0"))
-                {
-                    Debug.Log("Player " + (playerOrder[currentGameplayPlayer] + 1) + " has finished!");
-                    currentGameplayPlayer++;
-                    printedPlayerStartMoveMsg = false;
-
-                    if (currentGameplayPlayer >= 2)
-                    {
-                        currentGameState = GameState.PATH_REVEAL;
-                    }
-                }
             }
         }
         else if (currentGameState == GameState.PATH_REVEAL)
         {
-            List<Player.MoveDirections> completePath = new List<Player.MoveDirections>();
+            /*List<Player.MoveDirections> completePath = new List<Player.MoveDirections>();
             foreach (int i in playerOrder)
             {
                 completePath.AddRange(players[i].movesForCurrentRound);
@@ -299,7 +286,7 @@ public class GameManager : MonoBehaviour
                 {
                     Debug.Log("Good guys lost!");
                 }
-            }
+            }*/
         }
     }
 }
