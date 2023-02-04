@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
@@ -21,11 +23,17 @@ public class GameManager : MonoBehaviour
     int currentSaboteurSelectionPlayer = 0;
     int randomImpostor = 0;
     bool startingSaboteurSelect = true;
+    public GameObject textmeshpro_PlayerMessage;
+
+    public string CloseingEyes;
+    public string ImpostorDisplay;
+    TextMeshProUGUI textmeshpro_PlayerMessage_text;
     
 
     // Start is called before the first frame update
     void Start()
     {
+        textmeshpro_PlayerMessage_text = textmeshpro_PlayerMessage.GetComponent<TextMeshProUGUI>();
         
     }
 
@@ -91,6 +99,7 @@ public class GameManager : MonoBehaviour
             if (startingSaboteurSelect)
             {
                 Debug.Log("All players close your eyes!");
+                textmeshpro_PlayerMessage_text.text = CloseingEyes;
                 startingSaboteurSelect = false;
                 randomImpostor = Random.Range(0, 4);
             }
@@ -105,7 +114,7 @@ public class GameManager : MonoBehaviour
                 
                 if (currentSaboteurSelectionPlayer == randomImpostor)
                     Debug.Log("You are the impostor!");
-
+                textmeshpro_PlayerMessage_text.text = ImpostorDisplay;
                 currentSaboteurSelectionPlayer++;
                 currentWaitTime = 1.0f;
 
