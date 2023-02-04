@@ -13,6 +13,9 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private InputActionReference movement;
 
+    [SerializeField]
+    private GameObject PlayerInputs;
+
     enum GameState
     {
         STARTMENU,
@@ -128,14 +131,17 @@ public class GameManager : MonoBehaviour
         return players.Count;
     }
 
-    public void AddNewPlayer(int joypadNumber)
+    public bool IsPlayerInputInGame(PlayerInputs playerInputs)
     {
-        Player newPlayer = new Player();
-        newPlayer.number = players.Count + 1;
-        newPlayer.joypad = joypadNumber;
+        return players.Find(x => x.playerInputs == playerInputs) != null;
+    }
+
+    public void AddNewPlayer(PlayerInputs playerInput)
+    {
+        Player newPlayer = new Player(playerInput, players.Count + 1);
         players.Add(newPlayer);
 
-        PlayerSelected(newPlayer.number);
+        PlayerSelected(newPlayer.playerIndex);
     }
 
     private void PlayerSelected(int playerNumber)
@@ -244,28 +250,21 @@ public class GameManager : MonoBehaviour
                 if (movement.action.triggered)
                 {
                     Debug.Log("Triggered move for player " + playerOrder[currentGameplayPlayer] + "!");
-                    switch (movement.action.ReadValue<Vector2>())
-                    {
-                        case Vector2 v when v.Equals(Vector2.up):
-                            players[playerOrder[currentGameplayPlayer]].movesForCurrentRound.Add(Player.MoveDirections.UP);
-                            break;
 
-                        case Vector2 v when v.Equals(Vector2.down):
-                            players[playerOrder[currentGameplayPlayer]].movesForCurrentRound.Add(Player.MoveDirections.DOWN);
-                            break;
+                    Player player = players[playerOrder[currentGameplayPlayer]];
+                    Player.MoveDirections moveDirection = player.playerInputs.movementOutput switch 
+                    { 
+                        Vector2 v when v.Equals(Vector2.up) => Player.MoveDirections.UP,
+                        Vector2 v when v.Equals(Vector2.down) => Player.MoveDirections.DOWN,
+                        Vector2 v when v.Equals(Vector2.left) => Player.MoveDirections.LEFT,
+                        Vector2 v when v.Equals(Vector2.right) => Player.MoveDirections.RIGHT,
+                        _ => Player.MoveDirections.NONE,
+                    };
 
-                        case Vector2 v when v.Equals(Vector2.left):
-                            players[playerOrder[currentGameplayPlayer]].movesForCurrentRound.Add(Player.MoveDirections.LEFT);
-                            break;
-
-                        case Vector2 v when v.Equals(Vector2.right):
-                            players[playerOrder[currentGameplayPlayer]].movesForCurrentRound.Add(Player.MoveDirections.RIGHT);
-                            break;
-                    }
+                    if (moveDirection != Player.MoveDirections.NONE) player.movesForCurrentRound.Add(moveDirection);
                 }
 
-                if ((Input.GetKeyDown("joystick " + players[playerOrder[currentGameplayPlayer]].joypad + " button 0") && players[playerOrder[currentGameplayPlayer]].movesForCurrentRound.Count >= 1)
-                            || players[playerOrder[currentGameplayPlayer]].movesForCurrentRound.Count >= 3)
+                if ((players[playerOrder[currentGameplayPlayer]].playerInputs.playerSelect_Down && players[playerOrder[currentGameplayPlayer]].movesForCurrentRound.Count >= 1) || players[playerOrder[currentGameplayPlayer]].movesForCurrentRound.Count >= 3)
                 {
                     Debug.Log("Player " + (playerOrder[currentGameplayPlayer] + 1) + " has finished!");
                     currentGameplayPlayer++;
