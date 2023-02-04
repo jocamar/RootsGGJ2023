@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
@@ -15,53 +17,24 @@ public class GameManager : MonoBehaviour
         GAME_END
     }
 
-    public GameObject emptyTile;
-    public GameObject obstacleTile;
-    public GameObject startTile;
-    public GameObject endTile;
-
     List<Player> players = new List<Player>();
     GameState currentGameState = GameState.ASSIGNING_PLAYERS;
     float currentWaitTime = 0f;
     int currentSaboteurSelectionPlayer = 0;
     int randomImpostor = 0;
     bool startingSaboteurSelect = true;
-    Map map = new Map(15, 15);
+    public GameObject textmeshpro_PlayerMessage;
+
+    public string CloseingEyes;
+    public string ImpostorDisplay;
+    TextMeshProUGUI textmeshpro_PlayerMessage_text;
     
 
     // Start is called before the first frame update
     void Start()
     {
-        map.GenerateMap(10);
-
-        float originX = -2.5f;
-        float originY = -2f;
-
-        for (int x = 0; x < 15; x++)
-        {
-            for (int y = 0; y < 15; y++)
-            {
-                if (map.GetTile(x, y).type == Map.TileType.Obstacle)
-                {
-                    Instantiate(obstacleTile, new Vector3(originX + x * 0.3f, originY + y * 0.3f), Quaternion.identity);
-                }
-
-                if (map.GetTile(x, y).type == Map.TileType.Empty)
-                {
-                    Instantiate(emptyTile, new Vector3(originX + x * 0.3f, originY + y * 0.3f), Quaternion.identity);
-                }
-
-                if (map.GetTile(x, y).type == Map.TileType.Start)
-                {
-                    Instantiate(startTile, new Vector3(originX + x * 0.3f, originY + y * 0.3f), Quaternion.identity);
-                }
-
-                if (map.GetTile(x, y).type == Map.TileType.End)
-                {
-                    Instantiate(endTile, new Vector3(originX + x * 0.3f, originY + y * 0.3f), Quaternion.identity);
-                }
-            }
-        }
+        textmeshpro_PlayerMessage_text = textmeshpro_PlayerMessage.GetComponent<TextMeshProUGUI>();
+        
     }
 
     public void Reset()
@@ -72,7 +45,6 @@ public class GameManager : MonoBehaviour
         startingSaboteurSelect = true;
         currentSaboteurSelectionPlayer = 0;
         currentGameState = GameState.ASSIGNING_PLAYERS;
-        map = new Map(30, 30);
     }
 
     // Update is called once per frame
@@ -127,6 +99,7 @@ public class GameManager : MonoBehaviour
             if (startingSaboteurSelect)
             {
                 Debug.Log("All players close your eyes!");
+                textmeshpro_PlayerMessage_text.text = CloseingEyes;
                 startingSaboteurSelect = false;
                 randomImpostor = Random.Range(0, 4);
                 currentWaitTime = 1.0f;
@@ -140,7 +113,7 @@ public class GameManager : MonoBehaviour
                 
                 if (currentSaboteurSelectionPlayer == randomImpostor)
                     Debug.Log("You are the impostor!");
-
+                textmeshpro_PlayerMessage_text.text = ImpostorDisplay;
                 currentSaboteurSelectionPlayer++;
                 currentWaitTime = 1.0f;
 
@@ -150,6 +123,7 @@ public class GameManager : MonoBehaviour
         }
         else if (currentGameState == GameState.GAMEPLAY)
         {
+
         }
 
         /*string[] joystickNames = Input.GetJoystickNames();
