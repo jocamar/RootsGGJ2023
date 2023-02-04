@@ -13,6 +13,9 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private InputActionReference movement;
 
+    [SerializeField]
+    private GameObject PlayerInputs;
+
     enum GameState
     {
         STARTMENU,
@@ -42,6 +45,8 @@ public class GameManager : MonoBehaviour
     bool startingGameplayState = true;
     bool mapGenerated = false;
     bool printedPlayerStartMoveMsg = false;
+    bool printedStartVoteMsg = false;
+    bool printedStartDiscussionMsg = false;
     public GameObject PlayerMessage;
 
     public string CloseingEyes;
@@ -56,6 +61,7 @@ public class GameManager : MonoBehaviour
     int currentPositionX;
     int currentPositionY;
     int totalMoves = 30;
+    int currBlockedPlayer = -1;
 
     public static GameManager instance;
     private void Awake()
@@ -110,11 +116,14 @@ public class GameManager : MonoBehaviour
         startingSaboteurSelect = true;
         startingGameplayState = true;
         printedPlayerStartMoveMsg = false;
+        printedStartDiscussionMsg = false;
+        printedStartVoteMsg = false;
         currentSaboteurSelectionPlayer = 0;
         currentGameplayPlayer = 0;
         currentGameState = GameState.ASSIGNING_PLAYERS;
         totalMoves = 30;
         Destroy(mapObject);
+        currBlockedPlayer = -1;
     }
 
     public int GetCurrentPlayerNumber()
@@ -122,14 +131,17 @@ public class GameManager : MonoBehaviour
         return players.Count;
     }
 
-    public void AddNewPlayer(int joypadNumber)
+    public bool IsPlayerInputInGame(PlayerInputs playerInputs)
     {
-        Player newPlayer = new Player();
-        newPlayer.number = players.Count + 1;
-        newPlayer.joypad = joypadNumber;
+        return players.Find(x => x.playerInputs == playerInputs) != null;
+    }
+
+    public void AddNewPlayer(PlayerInputs playerInput)
+    {
+        Player newPlayer = new Player(playerInput, players.Count + 1);
         players.Add(newPlayer);
 
-        PlayerSelected(newPlayer.number);
+        PlayerSelected(newPlayer.playerIndex);
     }
 
     private void PlayerSelected(int playerNumber)
@@ -238,33 +250,31 @@ public class GameManager : MonoBehaviour
                 if (movement.action.triggered)
                 {
                     Debug.Log("Triggered move for player " + playerOrder[currentGameplayPlayer] + "!");
-                    switch (movement.action.ReadValue<Vector2>())
-                    {
-                        case Vector2 v when v.Equals(Vector2.up):
-                            players[playerOrder[currentGameplayPlayer]].movesForCurrentRound.Add(Player.MoveDirections.UP);
-                            break;
 
-                        case Vector2 v when v.Equals(Vector2.down):
-                            players[playerOrder[currentGameplayPlayer]].movesForCurrentRound.Add(Player.MoveDirections.DOWN);
-                            break;
+                    Player player = players[playerOrder[currentGameplayPlayer]];
+                    Player.MoveDirections moveDirection = player.playerInputs.movementOutput switch 
+                    { 
+                        Vector2 v when v.Equals(Vector2.up) => Player.MoveDirections.UP,
+                        Vector2 v when v.Equals(Vector2.down) => Player.MoveDirections.DOWN,
+                        Vector2 v when v.Equals(Vector2.left) => Player.MoveDirections.LEFT,
+                        Vector2 v when v.Equals(Vector2.right) => Player.MoveDirections.RIGHT,
+                        _ => Player.MoveDirections.NONE,
+                    };
 
-                        case Vector2 v when v.Equals(Vector2.left):
-                            players[playerOrder[currentGameplayPlayer]].movesForCurrentRound.Add(Player.MoveDirections.LEFT);
-                            break;
-
-                        case Vector2 v when v.Equals(Vector2.right):
-                            players[playerOrder[currentGameplayPlayer]].movesForCurrentRound.Add(Player.MoveDirections.RIGHT);
-                            break;
-                    }
+                    if (moveDirection != Player.MoveDirections.NONE) player.movesForCurrentRound.Add(moveDirection);
                 }
 
-                if (Input.GetKeyDown("joystick " + players[playerOrder[currentGameplayPlayer]].joypad + " button 0") || players[playerOrder[currentGameplayPlayer]].movesForCurrentRound.Count >= 3)
+                if ((players[playerOrder[currentGameplayPlayer]].playerInputs.playerSelect_Down && players[playerOrder[currentGameplayPlayer]].movesForCurrentRound.Count >= 1) || players[playerOrder[currentGameplayPlayer]].movesForCurrentRound.Count >= 3)
                 {
                     Debug.Log("Player " + (playerOrder[currentGameplayPlayer] + 1) + " has finished!");
                     currentGameplayPlayer++;
+
+                    if (currentGameplayPlayer == currBlockedPlayer)
+                        currentGameplayPlayer++;
+
                     printedPlayerStartMoveMsg = false;
 
-                    if (currentGameplayPlayer >= 2)
+                    if (currentGameplayPlayer >= 4)
                     {
                         currentGameState = GameState.PATH_REVEAL;
                     }
@@ -328,31 +338,92 @@ public class GameManager : MonoBehaviour
                     currentGameState = GameState.GAME_END;
                 }
 
+                printedStartDiscussionMsg = false;
                 currentGameState = GameState.DISCUSSION;
                 currentWaitTime = 20.0f;
             }
         }
         else if (currentGameState == GameState.DISCUSSION)
         {
-            Debug.Log("Discuss!");
+            if (!printedStartDiscussionMsg)
+            {
+                Debug.Log("Discuss!");
+                printedStartDiscussionMsg = true;
+            }
+
             currentWaitTime -= Time.deltaTime;
 
             if (currentWaitTime <= 0.0f)
             {
+                currBlockedPlayer = -1;
+                printedStartVoteMsg = false;
                 currentGameState = GameState.VOTING;
                 currentWaitTime = 10.0f;
             }
         }
         else if (currentGameState == GameState.VOTING)
         {
-            Debug.Log("Vote!");
             currentWaitTime -= Time.deltaTime;
 
-            if (currentWaitTime <= 0.0f)
+            if (!printedStartVoteMsg)
             {
+                Debug.Log("Start Voting!");
+                printedStartVoteMsg = true;
+            }
+
+            if (movement.action.triggered)
+            {
+                Debug.Log("Triggered select vote!");
+                switch (movement.action.ReadValue<Vector2>())
+                {
+                    case Vector2 v when v.Equals(Vector2.up):
+                        players[0].currentlySelectedVotePlayer = (players[0].currentlySelectedVotePlayer+1) % (PLAYERNUMBER_MAX+1);
+                        break;
+
+                    case Vector2 v when v.Equals(Vector2.down):
+                        players[0].currentlySelectedVotePlayer = (players[0].currentlySelectedVotePlayer - 1) % (PLAYERNUMBER_MAX+1);
+                        break;
+                }
+            }
+
+            if (Input.GetKeyDown("joystick 1 button 0"))
+            {
+                Debug.Log("Player 1 locked vote!");
+                players[0].lockedVote = true;
+            }
+
+            if (Input.GetKeyDown("joystick 2 button 0"))
+            {
+                Debug.Log("Player 2 locked vote!");
+                players[1].lockedVote = true;
+            }
+
+            if (Input.GetKeyDown("joystick 3 button 0"))
+            {
+                Debug.Log("Player 3 locked vote!");
+                players[2].lockedVote = true;
+            }
+
+            if (Input.GetKeyDown("joystick 4 button 0"))
+            {
+                Debug.Log("Player 4 locked vote!");
+                players[3].lockedVote = true;
+            }
+
+            if (currentWaitTime <= 0.0f || AllPlayersLockedVote())
+            {
+                int mostVotedPlayer = GetMostVotedPlayer();
+                if (mostVotedPlayer >= 0)
+                {
+                    Debug.Log("Player " + mostVotedPlayer + " was blocked!");
+                    currBlockedPlayer = mostVotedPlayer;
+                }
+
                 foreach (Player p in players)
                 {
                     p.movesForCurrentRound.Clear();
+                    p.currentlySelectedVotePlayer = 0;
+                    p.lockedVote = false;
                 }
 
                 currentGameState = GameState.GAMEPLAY;
@@ -360,5 +431,58 @@ public class GameManager : MonoBehaviour
                 currentGameplayPlayer = 0;
             }
         }
+    }
+
+    bool AllPlayersLockedVote()
+    {
+        foreach (Player p in players)
+        {
+            if (!p.lockedVote)
+                return false;
+        }
+        return true;
+    }
+
+    int GetMostVotedPlayer()
+    {
+        int[] votes = { 0, 0, 0, 0 };
+        foreach (Player p in players)
+        {
+            if (p.lockedVote)
+                votes[p.currentlySelectedVotePlayer]++;
+        }
+
+        int highestVoted = -1;
+        if (GetHighest(votes, out highestVoted))
+            return highestVoted;
+        return -1;
+    }
+
+    static bool GetHighest(int[] array, out int highest)
+    {
+        if (array.Length == 0)
+        {
+            highest = 0;
+            return false;
+        }
+
+        highest = array[0];
+        for (int i = 1; i < array.Length; i++)
+        {
+            if (array[i] > highest)
+            {
+                highest = array[i];
+            }
+        }
+
+        for (int i = 0; i < array.Length; i++)
+        {
+            if (array[i] != highest)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
