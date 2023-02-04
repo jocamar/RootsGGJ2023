@@ -69,12 +69,13 @@ public class Menu_PlayerSelection : MonoBehaviour
 
     void CreateNewPlayer()
     {
-        GameManager.instance.AddNewPlayer(1);
+        GameManager.instance.AddNewPlayer(Gamepad.current.deviceId);
     }
 
     void UpdatePlayerUI()
     {
         int index = GameManager.instance.GetCurrentPlayerNumber();
         playerSprites.Add(Instantiate(playerSprite, Root_PlayerSprites));
+        playerSprites[index].color = playerSpriteColorsSelection[index-1];
     }
 }
