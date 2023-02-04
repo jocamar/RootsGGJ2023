@@ -23,4 +23,7 @@ public class Player
         LEFT,
         RIGHT
     }
+
+    public int currentlySelectedVotePlayer = 0;
+    public bool lockedVote = false;
 }
