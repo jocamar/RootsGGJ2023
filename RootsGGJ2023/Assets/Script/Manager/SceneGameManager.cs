@@ -14,6 +14,7 @@ public class SceneGameManager : MonoBehaviour
     [SerializeField]
     private ScriptableObject_Scene MenuStartScene;
 
+
     public static SceneGameManager instance;
     private void Awake()
     {
