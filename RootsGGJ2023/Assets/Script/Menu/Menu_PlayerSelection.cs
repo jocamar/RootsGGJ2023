@@ -19,46 +19,32 @@ public class Menu_PlayerSelection : MonoBehaviour
     Image playerSprite;
 
     [SerializeField]
+    Text playerNumber;
+
+    [SerializeField]
     Color[] playerSpriteColorsSelection;
 
     [SerializeField]
     Image launchGameLoading;
 
+    [SerializeField]
+    float textPlayerNumberPositionOffset = -200;
+
     private float percentageLaunchGame;
 
     private List<Image> playerSprites = new List<Image>();
+    private List<Text> playerNumbers = new List<Text>();
 
     private const float TIMETOLAUNCHGAME = 1.5f;
 
     private void Start()
     {
         playerSprites.Add(playerSprite);
+        playerNumbers.Add(playerNumber);
     }
 
     void Update()
     {
-        if (movement.action.triggered)
-        {
-            switch (movement.action.ReadValue<Vector2>())
-            {
-                case Vector2 v when v.Equals(Vector2.up):
-                    Debug.Log($"Up");
-                    break;
-
-                case Vector2 v when v.Equals(Vector2.down):
-                    Debug.Log($"Down");
-                    break;
-
-                case Vector2 v when v.Equals(Vector2.left):
-                    Debug.Log($"Left");
-                    break;
-
-                case Vector2 v when v.Equals(Vector2.right):
-                    Debug.Log($"Right");
-                    break;
-            }
-        }
-
         bool onePlayerIsPressingKey = false;
 
         foreach (var player in PlayerInputs.allPlayers)
@@ -87,13 +73,22 @@ public class Menu_PlayerSelection : MonoBehaviour
 
     void CreateNewPlayer(PlayerInputs player)
     {
-        GameManager.instance.AddNewPlayer(player);
+        GameManager.instance.AddNewPlayer(player, playerSpriteColorsSelection[GameManager.instance.GetCurrentPlayerNumber()]);
     }
 
     void UpdatePlayerUI()
     {
         int index = GameManager.instance.GetCurrentPlayerNumber();
         playerSprites.Add(Instantiate(playerSprite, Root_PlayerSprites));
-        playerSprites[index].color = playerSpriteColorsSelection[index-1];
+        playerNumbers.Add(Instantiate(playerNumber, playerSprites[index].transform));
+
+        Color color = playerSpriteColorsSelection[index - 1];
+
+        Text playerText = playerNumbers[index];
+        playerText.text = $"Player {index}";
+        playerText.transform.localPosition = new Vector3(playerText.transform.position.x, playerText.transform.position.y + textPlayerNumberPositionOffset, 0);
+        playerText.color = color;
+
+        playerSprites[index].color = color;
     }
 }
