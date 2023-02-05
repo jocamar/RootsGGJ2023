@@ -2077,6 +2077,8 @@ MonoBehaviour:
   mapPrefab: {fileID: 6475806857481846677, guid: 6be47899a72e7ef408977a5ac3dbdb6e, type: 3}
   PlayerMessage: {fileID: 4514481677757379223}
   DiscussMessage: {fileID: 7514977496292063858}
+  VictoryScreen: {fileID: 2703127483272833017, guid: b7c8ff1626c9cb043a51a3661f766a9d, type: 3}
+  DefeatScreen: {fileID: 2200881462774742979, guid: 08d29c2a09b4ecd4ba063ec5040dcfeb, type: 3}
   P1OpenAudio: {fileID: 3321121814375631082}
   P2OpenAudio: {fileID: 1588047887702142347}
   P3OpenAudio: {fileID: 1387070143240562533}
