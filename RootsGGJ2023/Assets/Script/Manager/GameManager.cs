@@ -54,6 +54,8 @@ public class GameManager : MonoBehaviour
 
     public string CloseingEyes;
     public string ImpostorDisplay;
+    public string Discuss;
+    public int discussionTimer;
     TextMeshProUGUI PlayerMessage_text;
     TextMeshProUGUI PlayerNutrients_text;
 
@@ -153,17 +155,17 @@ public class GameManager : MonoBehaviour
         return players.Find(x => x.playerInputs == playerInputs) != null;
     }
 
-    public void AddNewPlayer(PlayerInputs playerInput)
+    public void AddNewPlayer(PlayerInputs playerInput, Color color)
     {
-        Player newPlayer = new Player(playerInput, players.Count + 1, false, false);
+        Player newPlayer = new Player(playerInput, players.Count + 1, false, false, color);
         players.Add(newPlayer);
 
-        PlayerSelected(newPlayer.playerIndex);
+        PlayerSelected(newPlayer.playerIndex, color);
     }
 
-    private void PlayerSelected(int playerNumber)
+    private void PlayerSelected(int playerNumber, Color color)
     {
-        Debug.Log("Player " + playerNumber + " Selected!");
+        Debug.Log($"Player {playerNumber} Selected!, he is color {color}");
     }
 
     // Update is called once per frame
@@ -193,7 +195,7 @@ public class GameManager : MonoBehaviour
                 {
                     Debug.Log("You are the impostor!");
                     PlayerMessage_text.text = ImpostorDisplay;
-                    Player player = players[playerOrder[currentGameplayPlayer]];
+                    Player player = players[randomImpostor];
                     player.isSaboteur = true;
                 }
                 currentSaboteurSelectionPlayer++;
@@ -329,7 +331,11 @@ public class GameManager : MonoBehaviour
                     }
                 }
             }
+        if (currentGameState == GameState.DISCUSSION)
+        {
+
         }
+    }
         else if (currentGameState == GameState.PATH_REVEAL)
         {
             List<Player.MoveDirections> completePath = new List<Player.MoveDirections>();

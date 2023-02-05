@@ -37,14 +37,12 @@ public class GrowVineScript : MonoBehaviour
 
         for (int i = 0; i < growVinesMaterials.Count; i++)
         {
-            Debug.Log("Patrick");
             StartCoroutine(GrowVines(growVinesMaterials[i]));
         }
     }
 
     IEnumerator GrowVines (Material mat)
     {
-        Debug.Log("Antoine");
         float growValue = mat.GetFloat("Grow_");
 
         if(!fullyGrown)
