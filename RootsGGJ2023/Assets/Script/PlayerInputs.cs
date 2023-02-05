@@ -9,6 +9,9 @@ public class PlayerInputs : MonoBehaviour
     public bool playerSelect;
     public bool playerSelect_Down;
 
+    public bool playerSabotage;
+    public bool playerSabotage_Down;
+
     public bool movementReset;
 
     public PlayerInput playerInput;
@@ -53,6 +56,18 @@ public class PlayerInputs : MonoBehaviour
         if (!pastValue && playerSelect)
         {
             playerSelect_Down = true;
+            Shake();
+        }
+    }
+
+    public void PlayerSabotage(InputAction.CallbackContext ctx)
+    {
+        bool pastValue = playerSabotage;
+        playerSabotage = ctx.ReadValueAsButton();
+
+        if (!pastValue && playerSabotage)
+        {
+            playerSabotage_Down = true;
             Shake();
         }
     }
@@ -125,6 +140,7 @@ public class PlayerInputs : MonoBehaviour
     private void LateUpdate()
     {
         playerSelect_Down = false;
+        playerSabotage_Down = false;
         movementOutput = Vector2.zero;
     }
 }
