@@ -200,7 +200,7 @@ public class GameManager : MonoBehaviour
                 Debug.Log("All players close your eyes!");
                 PlayerMessage_text.text = CloseingEyes;
                 startingSaboteurSelect = false;
-                randomImpostor = Random.Range(0, 4);
+                randomImpostor = Random.Range(0, players.Count);
                 currentWaitTime = 5.0f;
             }
 
@@ -379,6 +379,7 @@ public class GameManager : MonoBehaviour
 
                 if (!saboteurHasUsedDisrupt && randomImpostor < players.Count && players[randomImpostor].playerInputs.playerSabotage_Down)
                 {
+                    Debug.Log("Saboteur used Disrupt!");
                     players[playerOrder[currentGameplayPlayer]].isDisrupt = true;
                     saboteurHasUsedDisrupt = true;
                 }
@@ -495,6 +496,13 @@ public class GameManager : MonoBehaviour
                     {
                         Debug.Log("Good guys lost!");
                         currentGameState = GameState.GAME_END;
+                    }
+                    else if (i >= completePath.Count - 1)
+                    {
+                        if (prevRootTile != null)
+                        {
+                            prevRootTile.GetComponent<RootSpriteController>().ChangeNextDir(Player.MoveDirections.NONE);
+                        }
                     }
                 }
 
