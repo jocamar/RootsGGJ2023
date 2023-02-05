@@ -35,6 +35,7 @@ public class GameManager : MonoBehaviour
     public GameObject endTile;
     public GameObject mapPrefab;
     public GameObject PlayerMessage;
+    public GameObject DiscussMessage;
 
     public GameObject P1OpenAudio;
     public GameObject P2OpenAudio;
@@ -69,6 +70,7 @@ public class GameManager : MonoBehaviour
     int Displaytimer;
     TextMeshProUGUI PlayerMessage_text;
     TextMeshProUGUI PlayerNutrients_text;
+    TextMeshProUGUI DiscussMessage_text;
 
     int PLAYERNUMBER_MAX = 4;
     public int PlayerMaxNumber { get { return PLAYERNUMBER_MAX; } }
@@ -107,6 +109,7 @@ public class GameManager : MonoBehaviour
     {
         PlayerMessage_text = PlayerMessage.GetComponent<TextMeshProUGUI>();
         PlayerNutrients_text = NutrientsMessage.GetComponent<TextMeshProUGUI>();
+        DiscussMessage_text = DiscussMessage.GetComponent<TextMeshProUGUI>();
     }
 
     public void StartPlayerSelection()
@@ -246,7 +249,7 @@ public class GameManager : MonoBehaviour
 
                 for (int i = 0; i < players.Count; i++)
                 {
-                    Player_UIs[i].GetComponent<PlayerInGameUI>().Initialize(players[i]);
+                    Player_UIs[i].GetComponent<PlayerInGameUI>().Initialize(players[i], players.Count);
                 }
 
                 if (!mapGenerated)
@@ -434,31 +437,24 @@ public class GameManager : MonoBehaviour
             foreach (GameObject obj in Player_UIs)
                 obj.GetComponent<PlayerInGameUI>().StopBlock();
 
+            GameObject prevRootTile = null;
             for (int i = 0; i < completePath.Count; i++)
             {
-                Player.MoveDirections dir = completePath[i];
-                Player.MoveDirections dirAfter = i < completePath.Count - 1 ? completePath[i + 1] : Player.MoveDirections.NONE;
-
-                if (i == 0 && lastRootTile != null)
-                {
-                    lastRootTile.GetComponent<RootSpriteController>().ChangeNextDir(dir);
-                }
-
                 int newX = currentPositionX;
                 int newY = currentPositionY;
-                if (dir == Player.MoveDirections.DOWN)
+                if (completePath[i] == Player.MoveDirections.DOWN)
                 {
                     newY--;
                 }
-                else if (dir == Player.MoveDirections.UP)
+                else if (completePath[i] == Player.MoveDirections.UP)
                 {
                     newY++;
                 }
-                else if (dir == Player.MoveDirections.RIGHT)
+                else if (completePath[i] == Player.MoveDirections.RIGHT)
                 {
                     newX++;
                 }
-                else if (dir == Player.MoveDirections.LEFT)
+                else if (completePath[i] == Player.MoveDirections.LEFT)
                 {
                     newX--;
                 }
@@ -467,6 +463,19 @@ public class GameManager : MonoBehaviour
                 {
                     if (map.GetTile(newX, newY).type == Map.TileType.Empty)
                     {
+                        Player.MoveDirections dir = completePath[i];
+                        Player.MoveDirections dirAfter = i < completePath.Count - 1 ? completePath[i + 1] : Player.MoveDirections.NONE;
+
+                        if (i == 0 && lastRootTile != null)
+                        {
+                            lastRootTile.GetComponent<RootSpriteController>().ChangeNextDir(completePath[i]);
+                        }
+
+                        if (prevRootTile != null)
+                        {
+                            prevRootTile.GetComponent<RootSpriteController>().ChangeNextDir(dir);
+                        }
+
                         lastMoveDirection = dir;
                         currentPositionX = newX;
                         currentPositionY = newY;
@@ -477,6 +486,7 @@ public class GameManager : MonoBehaviour
                         var newObj = Instantiate(rootTile, new Vector3(originX + currentPositionX * mapTileScale, originY + currentPositionY * mapTileScale), Quaternion.identity);
                         newObj.GetComponent<RootSpriteController>().SetMoveDirections(dir, dirAfter);
                         map.SetObject(currentPositionX, currentPositionY, newObj);
+                        prevRootTile = newObj;
 
                         if (dirAfter == Player.MoveDirections.NONE)
                             lastRootTile = newObj;
@@ -513,26 +523,15 @@ public class GameManager : MonoBehaviour
 
             currentWaitTime -= Time.deltaTime;
 
+            DiscussMessage_text.text = Discuss + currentWaitTime;
+
             if (currentWaitTime <= 0.0f)
             {
+                DiscussMessage_text.text = "";
                 currBlockedPlayer = -1;
                 printedStartVoteMsg = false;
                 currentGameState = GameState.VOTING;
                 currentWaitTime = 10.0f;
-            }
-            Displaytimer = discussionTimer*1000;
-            System.Timers.Timer discusstimer = new System.Timers.Timer();
-            discusstimer.Interval = 1000;
-            discusstimer.Elapsed += new System.Timers.ElapsedEventHandler(OnTimedEvent);
-            discusstimer.Enabled = true;
-            PlayerMessage_text.text = Discuss + Displaytimer;
-            void OnTimedEvent (object source, System.Timers.ElapsedEventArgs e)
-            {
-                Displaytimer = Displaytimer - 1000;
-                if (Displaytimer >= 0)
-                {
-                    currentGameState = GameState.VOTING;
-                }
             }
         }
         else if (currentGameState == GameState.VOTING)
@@ -548,26 +547,27 @@ public class GameManager : MonoBehaviour
                     Player_UIs[i].GetComponent<PlayerInGameUI>().StartVoting();
             }
 
-            if (movement.action.triggered)
+            
+            foreach (Player p in players)
             {
-                foreach (Player p in players)
+                if (p.lockedVote)
+                    continue;
+
+                Player.MoveDirections moveDirection = p.playerInputs.movementOutput switch
                 {
-                    if (p.lockedVote)
-                        continue;
+                    Vector2 v when v.Equals(Vector2.up) => Player.MoveDirections.UP,
+                    Vector2 v when v.Equals(Vector2.down) => Player.MoveDirections.DOWN,
+                    _ => Player.MoveDirections.NONE,
+                };
 
-                    Player.MoveDirections moveDirection = p.playerInputs.movementOutput switch
-                    {
-                        Vector2 v when v.Equals(Vector2.up) => Player.MoveDirections.UP,
-                        Vector2 v when v.Equals(Vector2.down) => Player.MoveDirections.DOWN,
-                        _ => Player.MoveDirections.NONE,
-                    };
-
-                    if (moveDirection == Player.MoveDirections.UP) p.currentlySelectedVotePlayer = (p.currentlySelectedVotePlayer + 1) % (PLAYERNUMBER_MAX + 1);
-                    if (moveDirection == Player.MoveDirections.DOWN) p.currentlySelectedVotePlayer = (p.currentlySelectedVotePlayer - 1) % (PLAYERNUMBER_MAX + 1);
+                if (moveDirection == Player.MoveDirections.UP) p.currentlySelectedVotePlayer = (p.currentlySelectedVotePlayer + 1) % (players.Count + 1);
+                if (moveDirection == Player.MoveDirections.DOWN)
+                {
+                    int newVote = p.currentlySelectedVotePlayer - 1;
+                    if (newVote < 0)
+                        newVote = players.Count;
+                    p.currentlySelectedVotePlayer = newVote;
                 }
-                
-
-                Debug.Log("Triggered select vote!");
             }
 
             foreach (Player p in players)

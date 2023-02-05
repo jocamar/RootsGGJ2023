@@ -12,7 +12,7 @@ public class PlayerInGameUI : MonoBehaviour
     public GameObject blockedLabel;
 
     private Player player = null;
-
+    private int totalPlayers = -1;
     // Start is called before the first frame update
     void Start()
     {
@@ -23,8 +23,9 @@ public class PlayerInGameUI : MonoBehaviour
         blockedLabel.SetActive(false);
     }
 
-    public void Initialize(Player p)
+    public void Initialize(Player p, int numPlayers)
     {
+        totalPlayers = numPlayers;
         player = p;
         voteLabel.SetActive(false);
         playingLabel.SetActive(false);
@@ -70,8 +71,16 @@ public class PlayerInGameUI : MonoBehaviour
     {
         if (player != null)
         {
-            voteValue.GetComponent<TextMeshProUGUI>().text = player.currentlySelectedVotePlayer < 4 ? "" + (player.currentlySelectedVotePlayer + 1) : "NONE";
-            voteLabel.GetComponent<TextMeshProUGUI>().color = player.lockedVote ? Color.red : Color.white;
+            voteValue.GetComponent<TextMeshProUGUI>().text = player.currentlySelectedVotePlayer < totalPlayers ? "" + (player.currentlySelectedVotePlayer + 1) : "NONE";
+
+            if (player.lockedVote)
+            {
+                voteLabel.GetComponent<TextMeshProUGUI>().color = Color.red;
+            }
+            else
+            {
+                voteLabel.GetComponent<TextMeshProUGUI>().color = Color.white;
+            }
         }
     }
 }
