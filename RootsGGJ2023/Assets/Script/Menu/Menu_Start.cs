@@ -14,7 +14,6 @@ public class Menu_Start : MonoBehaviour
         if (select.action.triggered)
         {
             SceneGameManager.instance.StartPlayerSelectionScene();
-
         }
     }
 }
