@@ -60,6 +60,7 @@ public class GameManager : MonoBehaviour
     bool printedStartVoteMsg = false;
     bool printedStartDiscussionMsg = false;
     public GameObject NutrientsMessage;
+    public GameObject NutrientsLabel;
 
     public List<GameObject> Player_UIs;
 
@@ -110,6 +111,8 @@ public class GameManager : MonoBehaviour
         PlayerMessage_text = PlayerMessage.GetComponent<TextMeshProUGUI>();
         PlayerNutrients_text = NutrientsMessage.GetComponent<TextMeshProUGUI>();
         DiscussMessage_text = DiscussMessage.GetComponent<TextMeshProUGUI>();
+        NutrientsLabel.SetActive(false);
+        NutrientsMessage.SetActive(false);
     }
 
     public void StartPlayerSelection()
@@ -234,6 +237,7 @@ public class GameManager : MonoBehaviour
                     }
                     else
                     {
+                        PlayerMessage_text.color = Color.white;
                         PlayerMessage_text.text = "You are not the impostor! :)";
                         Debug.Log("You are not the impostor!");
                     }
@@ -248,13 +252,16 @@ public class GameManager : MonoBehaviour
             {
                 PlayerMessage_text.text = "";
 
-                for (int i = 0; i < players.Count; i++)
-                {
-                    Player_UIs[i].GetComponent<PlayerInGameUI>().Initialize(players[i], players.Count);
-                }
-
                 if (!mapGenerated)
                 {
+                    NutrientsLabel.SetActive(true);
+                    NutrientsMessage.SetActive(true);
+
+                    for (int i = 0; i < players.Count; i++)
+                    {
+                        Player_UIs[i].GetComponent<PlayerInGameUI>().Initialize(players[i], players.Count);
+                    }
+
                     mapObject = Instantiate(mapPrefab);
                     map = mapObject.GetComponent<Map>();
                     map.Initialize(this, 15, 15);
@@ -532,7 +539,7 @@ public class GameManager : MonoBehaviour
 
             currentWaitTime -= Time.deltaTime;
 
-            DiscussMessage_text.text = Discuss + currentWaitTime;
+            DiscussMessage_text.text = Discuss + string.Format("{0:0.0}", currentWaitTime);
 
             if (currentWaitTime <= 0.0f)
             {
