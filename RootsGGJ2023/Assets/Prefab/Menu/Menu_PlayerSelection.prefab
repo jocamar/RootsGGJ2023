@@ -45,12 +45,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   select: {fileID: -2306004728817084367, guid: eddcbaba45605c0488d9dc850851d034, type: 3}
   movement: {fileID: -4247825752905066545, guid: eddcbaba45605c0488d9dc850851d034, type: 3}
+  playerImages:
+  - {fileID: 21300000, guid: 5428f0a45e4d5d54fb64ffd4f86e012a, type: 3}
+  - {fileID: 21300000, guid: de8ec98a131afe945a72fa0505385640, type: 3}
+  - {fileID: 21300000, guid: 790d2de0db94a9f40ae7472feb722530, type: 3}
+  - {fileID: 21300000, guid: 7cfdee29546c2dc498da2a12dec69cfa, type: 3}
   Root_PlayerSprites: {fileID: 0}
   playerSprite: {fileID: 8217361642728249866, guid: dcf25149e3a181542ae0f6f9fce59c86, type: 3}
   playerNumber: {fileID: 7225402214208645652, guid: 2249c6e5bc7fc2b4782690648c3dcb52, type: 3}
+  playerActionNeeded: {fileID: 0}
   playerSpriteColorsSelection:
-  - {r: 1, g: 0, b: 0, a: 1}
-  - {r: 0, g: 1, b: 0.0075297356, a: 1}
-  - {r: 1, g: 0, b: 0.83533955, a: 1}
-  - {r: 0.0057164747, g: 0.0047169924, b: 1, a: 1}
+  - {r: 1, g: 0.67801476, b: 0.25943398, a: 1}
+  - {r: 1, g: 0.3160377, b: 0.8931309, a: 1}
+  - {r: 0.33490568, g: 0.33490568, b: 1, a: 1}
+  - {r: 0.3726415, g: 1, b: 0.98899376, a: 1}
   launchGameLoading: {fileID: 0}
+  textPlayerNumberPositionOffset: -200

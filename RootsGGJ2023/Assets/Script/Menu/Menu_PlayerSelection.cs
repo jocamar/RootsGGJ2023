@@ -13,6 +13,10 @@ public class Menu_PlayerSelection : MonoBehaviour
     private InputActionReference movement;
 
     [SerializeField]
+    
+    Sprite[] playerImages;
+
+    [SerializeField]
     Transform Root_PlayerSprites;
 
     [SerializeField]
@@ -100,5 +104,6 @@ public class Menu_PlayerSelection : MonoBehaviour
         playerText.color = color;
 
         playerSprites[index].color = color;
+        playerSprites[index].sprite = playerImages[index -1];
     }
 }
