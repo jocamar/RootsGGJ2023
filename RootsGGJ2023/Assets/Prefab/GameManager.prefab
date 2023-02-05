@@ -1439,6 +1439,8 @@ MonoBehaviour:
   - {fileID: 6701735018627715823}
   CloseingEyes: ALL PLAYERS CLOSE YOUR EYES !
   ImpostorDisplay: YOU ARE THE IMPOSTOR
+  Discuss: DISCUSS !
+  discussionTimer: 90
 --- !u!1 &4514481677757379223
 GameObject:
   m_ObjectHideFlags: 0
