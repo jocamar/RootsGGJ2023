@@ -144,6 +144,7 @@ MonoBehaviour:
   playerSabotage_Down: 1
   movementReset: 1
   playerInput: {fileID: 1711849268070526824}
-  movementOutput: {x: 0, y: 1}
+  movementOutput: {x: 1, y: 0}
+  playerInputsAction: {fileID: -944628639613478452, guid: eddcbaba45605c0488d9dc850851d034, type: 3}
   vfxTemplate: {fileID: 1866223618516581701, guid: 1384804ff3b419442bcb7bd7950f0ea0, type: 3}
   particleFloatSpeedMultiplier: 10
