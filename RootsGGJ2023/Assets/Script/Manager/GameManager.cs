@@ -54,6 +54,8 @@ public class GameManager : MonoBehaviour
 
     public string CloseingEyes;
     public string ImpostorDisplay;
+    public string Discuss;
+    public int discussionTimer;
     TextMeshProUGUI PlayerMessage_text;
     TextMeshProUGUI PlayerNutrients_text;
 
@@ -187,7 +189,7 @@ public class GameManager : MonoBehaviour
                 {
                     Debug.Log("You are the impostor!");
                     PlayerMessage_text.text = ImpostorDisplay;
-                    Player player = players[playerOrder[currentGameplayPlayer]];
+                    Player player = players[randomImpostor];
                     player.isSaboteur = true;
                 }
                 currentSaboteurSelectionPlayer++;
@@ -348,7 +350,11 @@ public class GameManager : MonoBehaviour
                     }
                 }
             }
+        if (currentGameState == GameState.DISCUSSION)
+        {
+
         }
+    }
         else if (currentGameState == GameState.PATH_REVEAL)
         {
             List<Player.MoveDirections> completePath = new List<Player.MoveDirections>();
