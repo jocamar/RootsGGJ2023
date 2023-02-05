@@ -37,28 +37,6 @@ public class Menu_PlayerSelection : MonoBehaviour
 
     void Update()
     {
-        if (movement.action.triggered)
-        {
-            switch (movement.action.ReadValue<Vector2>())
-            {
-                case Vector2 v when v.Equals(Vector2.up):
-                    Debug.Log($"Up");
-                    break;
-
-                case Vector2 v when v.Equals(Vector2.down):
-                    Debug.Log($"Down");
-                    break;
-
-                case Vector2 v when v.Equals(Vector2.left):
-                    Debug.Log($"Left");
-                    break;
-
-                case Vector2 v when v.Equals(Vector2.right):
-                    Debug.Log($"Right");
-                    break;
-            }
-        }
-
         bool onePlayerIsPressingKey = false;
 
         foreach (var player in PlayerInputs.allPlayers)
@@ -87,7 +65,7 @@ public class Menu_PlayerSelection : MonoBehaviour
 
     void CreateNewPlayer(PlayerInputs player)
     {
-        GameManager.instance.AddNewPlayer(player);
+        GameManager.instance.AddNewPlayer(player, playerSpriteColorsSelection[GameManager.instance.GetCurrentPlayerNumber()]);
     }
 
     void UpdatePlayerUI()

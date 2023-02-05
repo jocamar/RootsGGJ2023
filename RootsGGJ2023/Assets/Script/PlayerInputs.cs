@@ -15,6 +15,10 @@ public class PlayerInputs : MonoBehaviour
     public static List<PlayerInputs> allPlayers = new List<PlayerInputs>();
     public Vector2 movementOutput;
 
+    private List<ShakeRequest> allShakeRequest = new List<ShakeRequest>();
+
+    public Gamepad gamepad => Gamepad.all.FirstOrDefault(g => playerInput.devices.Any(d => d.deviceId == g.deviceId));
+
     public static Vector2 SnapVector(Vector2 value)
     {
         if (value.magnitude < 0.5f) return Vector2.zero;
@@ -35,6 +39,7 @@ public class PlayerInputs : MonoBehaviour
         {
             movementOutput = movement;
             movementReset = false;
+            Shake();
         }
 
         if (movement == Vector2.zero) movementReset = true;
@@ -48,6 +53,31 @@ public class PlayerInputs : MonoBehaviour
         if (!pastValue && playerSelect)
         {
             playerSelect_Down = true;
+            Shake();
+        }
+    }
+
+    public void Shake(float power = 0.5f, float time = 0.05f, float location = 0f)
+    {
+        allShakeRequest.Add(new ShakeRequest(power, time, location));
+    }
+
+    private void OnApplicationQuit()
+    {
+        InputSystem.ResetHaptics();
+    }
+
+    public class ShakeRequest
+    {
+        public float power;
+        public float time;
+        public float location;
+
+        public ShakeRequest(float power, float time, float location)
+        {
+            this.power = power;
+            this.time = time;
+            this.location = location;
         }
     }
 
@@ -55,6 +85,41 @@ public class PlayerInputs : MonoBehaviour
     {
         allPlayers.Add(this);
         playerInput = GetComponent<PlayerInput>();
+    }
+
+    private void Update()
+    {
+        if (gamepad != null)
+        {
+            float bestPowerLeft = 0;
+            float bestPowerRight = 0;
+            List<ShakeRequest> validShakeRequest = new List<ShakeRequest>();
+            foreach (var shakeRequest in allShakeRequest)
+            {
+                if (shakeRequest.time > 0)
+                {
+                    validShakeRequest.Add(shakeRequest);
+                    float powerLeft = 1 - Mathf.Clamp01(Mathf.Abs(-1 - shakeRequest.location) - 1);
+                    float powerRight = 1 - Mathf.Clamp01(Mathf.Abs(1 - shakeRequest.location) - 1);
+                    bestPowerLeft = Mathf.Max(powerLeft, bestPowerLeft);
+                    bestPowerRight = Mathf.Max(powerRight, bestPowerRight);
+                }
+                shakeRequest.time = Mathf.MoveTowards(shakeRequest.time, 0, Time.deltaTime);
+            }
+            allShakeRequest = validShakeRequest;
+            if (bestPowerLeft > 0 || bestPowerRight > 0)
+            {
+                gamepad.SetMotorSpeeds(bestPowerLeft, bestPowerRight);
+            }
+            else
+            {
+                gamepad.ResetHaptics();
+            }
+        }
+        else
+        {
+            allShakeRequest = new List<ShakeRequest>();
+        }
     }
 
     private void LateUpdate()

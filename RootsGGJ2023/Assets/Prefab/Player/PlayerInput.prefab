@@ -72,7 +72,7 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
     m_ActionId: c4012421-adeb-410d-9b99-1fb5e2473a56
-    m_ActionName: Inputs_Player/Select[/DualShock4GamepadHID/buttonSouth]
+    m_ActionName: Inputs_Player/Select[/DualShock4GamepadHID/buttonSouth,/Keyboard/space]
   - m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7206634111523251183}
@@ -88,7 +88,7 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
     m_ActionId: 1cc319c3-d750-4a06-8a6e-548778b41874
-    m_ActionName: Inputs_Player/Movement[/DualShock4GamepadHID/dpad/up,/DualShock4GamepadHID/dpad/down,/DualShock4GamepadHID/dpad/left,/DualShock4GamepadHID/dpad/right,/Keyboard/upArrow,/Keyboard/downArrow,/Keyboard/leftArrow,/Keyboard/rightArrow]
+    m_ActionName: Inputs_Player/Movement[/DualShock4GamepadHID/dpad/up,/DualShock4GamepadHID/dpad/down,/DualShock4GamepadHID/dpad/left,/DualShock4GamepadHID/dpad/right,/Keyboard/upArrow,/Keyboard/downArrow,/Keyboard/leftArrow,/Keyboard/rightArrow,/DualShock4GamepadHID/leftStick,/DualShock4GamepadHID/rightStick]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Inputs_Player
@@ -108,6 +108,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerSelect: 0
   playerSelect_Down: 1
-  movementReset: 0
+  movementReset: 1
   playerInput: {fileID: 0}
-  movementOutput: {x: 0, y: 0}
+  movementOutput: {x: 1, y: 0}
