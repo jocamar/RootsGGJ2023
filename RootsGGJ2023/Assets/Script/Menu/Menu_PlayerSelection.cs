@@ -71,8 +71,10 @@ public class Menu_PlayerSelection : MonoBehaviour
         }
     }
 
+    [System.Obsolete]
     void CreateNewPlayer(PlayerInputs player)
     {
+        player.EnableVFX(playerSpriteColorsSelection[GameManager.instance.GetCurrentPlayerNumber()]);
         GameManager.instance.AddNewPlayer(player, playerSpriteColorsSelection[GameManager.instance.GetCurrentPlayerNumber()]);
     }
 

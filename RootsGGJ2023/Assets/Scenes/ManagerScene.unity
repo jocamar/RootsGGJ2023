@@ -248,6 +248,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4514481677673615016, guid: fdb4c8480f841b04a8947d02c227e31d, type: 3}
+      propertyPath: Discuss
+      value: 'DISCUSS ! Time left: '
+      objectReference: {fileID: 0}
     - target: {fileID: 4514481678285809431, guid: fdb4c8480f841b04a8947d02c227e31d, type: 3}
       propertyPath: m_RootOrder
       value: 0

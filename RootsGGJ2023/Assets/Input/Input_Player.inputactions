@@ -28,6 +28,14 @@
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": ""
+                },
+                {
+                    "name": "FlyingVFX",
+                    "type": "Button",
+                    "id": "11e47b7a-c0be-4d7b-8d8a-8886ab3a92d3",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
                 }
             ],
             "bindings": [
@@ -165,17 +173,6 @@
                 },
                 {
                     "name": "",
-                    "id": "0d2906b1-e798-4c63-b6b9-1fd42f9c7587",
-                    "path": "<Gamepad>/leftStick",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Movement",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "9b5ddee8-1077-4142-9cd1-614935bedb39",
                     "path": "<Gamepad>/rightStick",
                     "interactions": "",
@@ -215,6 +212,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Sabotage",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "bbaac561-35b4-449d-97a7-a4de66d70af3",
+                    "path": "<Gamepad>/leftStick",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "FlyingVFX",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

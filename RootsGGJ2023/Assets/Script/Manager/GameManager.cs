@@ -66,6 +66,7 @@ public class GameManager : MonoBehaviour
     public string ImpostorDisplay;
     public string Discuss;
     public int discussionTimer;
+    int Displaytimer;
     TextMeshProUGUI PlayerMessage_text;
     TextMeshProUGUI PlayerNutrients_text;
 
@@ -318,26 +319,24 @@ public class GameManager : MonoBehaviour
 
                     if (playerOrder[currentGameplayPlayer] != currBlockedPlayer)
                     {
-                        if (movement.action.triggered)
+                        Player player = players[playerOrder[currentGameplayPlayer]];
+                        Player.MoveDirections moveDirection = player.playerInputs.movementOutput switch
+                        {
+                            Vector2 v when v.Equals(Vector2.up) => Player.MoveDirections.UP,
+                            Vector2 v when v.Equals(Vector2.down) => Player.MoveDirections.DOWN,
+                            Vector2 v when v.Equals(Vector2.left) => Player.MoveDirections.LEFT,
+                            Vector2 v when v.Equals(Vector2.right) => Player.MoveDirections.RIGHT,
+                            _ => Player.MoveDirections.NONE,
+                        };
+
+                        if (moveDirection != Player.MoveDirections.NONE)
                         {
                             Debug.Log("Triggered move for player " + playerOrder[currentGameplayPlayer] + "!");
-
-                            Player player = players[playerOrder[currentGameplayPlayer]];
-                            
-                            Player.MoveDirections moveDirection = player.playerInputs.movementOutput switch
-                            {
-                                Vector2 v when v.Equals(Vector2.up) => Player.MoveDirections.UP,
-                                Vector2 v when v.Equals(Vector2.down) => Player.MoveDirections.DOWN,
-                                Vector2 v when v.Equals(Vector2.left) => Player.MoveDirections.LEFT,
-                                Vector2 v when v.Equals(Vector2.right) => Player.MoveDirections.RIGHT,
-                                _ => Player.MoveDirections.NONE,
-                            };
-
-                            if (moveDirection != Player.MoveDirections.NONE) player.movesForCurrentRound.Add(moveDirection);
+                            player.movesForCurrentRound.Add(moveDirection);
                         }
                     }
 
-                    if ((players[playerOrder[currentGameplayPlayer]].playerInputs.playerSelect_Down && players[playerOrder[currentGameplayPlayer]].movesForCurrentRound.Count >= 1)
+                    if ((players[playerOrder[currentGameplayPlayer]].playerInputs.playerSelect_Down && players[playerOrder[currentGameplayPlayer]].movesForCurrentRound.Count >= 0)
                             || players[playerOrder[currentGameplayPlayer]].movesForCurrentRound.Count >= 3
                             || playerOrder[currentGameplayPlayer] == currBlockedPlayer)
                     {
@@ -354,6 +353,7 @@ public class GameManager : MonoBehaviour
                         Player_UIs[playerOrder[currentGameplayPlayer]].GetComponent<PlayerInGameUI>().StopMoving();
                         Debug.Log("Player " + (playerOrder[currentGameplayPlayer] + 1) + " has finished!");
                         currentGameplayPlayer++;
+                        delayAfterPlayerMoved = false;
 
                         if (currentGameplayPlayer >= players.Count)
                         {
@@ -374,7 +374,7 @@ public class GameManager : MonoBehaviour
                     }
                 }
 
-                if (!saboteurHasUsedDisrupt && players[randomImpostor].playerInputs.playerSabotage_Down)
+                if (!saboteurHasUsedDisrupt && randomImpostor < players.Count && players[randomImpostor].playerInputs.playerSabotage_Down)
                 {
                     players[playerOrder[currentGameplayPlayer]].isDisrupt = true;
                     saboteurHasUsedDisrupt = true;
@@ -520,6 +520,20 @@ public class GameManager : MonoBehaviour
                 currentGameState = GameState.VOTING;
                 currentWaitTime = 10.0f;
             }
+            Displaytimer = discussionTimer*1000;
+            System.Timers.Timer discusstimer = new System.Timers.Timer();
+            discusstimer.Interval = 1000;
+            discusstimer.Elapsed += new System.Timers.ElapsedEventHandler(OnTimedEvent);
+            discusstimer.Enabled = true;
+            PlayerMessage_text.text = Discuss + Displaytimer;
+            void OnTimedEvent (object source, System.Timers.ElapsedEventArgs e)
+            {
+                Displaytimer = Displaytimer - 1000;
+                if (Displaytimer >= 0)
+                {
+                    currentGameState = GameState.VOTING;
+                }
+            }
         }
         else if (currentGameState == GameState.VOTING)
         {
@@ -591,6 +605,7 @@ public class GameManager : MonoBehaviour
                 startingGameplayState = true;
                 saboteurHasUsedDisrupt = false;
                 currentGameplayPlayer = 0;
+                printedPlayerStartMoveMsg = false;
             }
         }
     }
