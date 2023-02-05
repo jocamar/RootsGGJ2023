@@ -25,7 +25,8 @@ public class GameManager : MonoBehaviour
         PATH_REVEAL,
         DISCUSSION,
         VOTING,
-        GAME_END
+        GAME_END,
+        FINISH
     }
 
     public GameObject emptyTile;
@@ -508,6 +509,7 @@ public class GameManager : MonoBehaviour
                         Debug.Log("Good guys lost!");
                         SaboteurWins = false;
                         currentGameState = GameState.GAME_END;
+                        return;
                     }
                     else if (i >= completePath.Count - 1)
                     {
@@ -527,6 +529,7 @@ public class GameManager : MonoBehaviour
                     Debug.Log("Good guys lost!");
                     SaboteurWins = true;
                     currentGameState = GameState.GAME_END;
+                    return;
                 }
 
                 printedStartDiscussionMsg = false;
@@ -631,13 +634,15 @@ public class GameManager : MonoBehaviour
         }
         else if (currentGameState == GameState.GAME_END)
         {
+            currentGameState = GameState.FINISH;
+
             if (SaboteurWins == false)
             { 
-                var screen = Instantiate(VictoryScreen, new Vector2(0, 0), Quaternion.identity);
+                var screen = Instantiate(VictoryScreen, new Vector3(0, 0, -1), Quaternion.identity);
             }
             else if (SaboteurWins == true)
             {
-            var screen = Instantiate(DefeatScreen, new Vector2(0, 0), Quaternion.identity);
+            var screen = Instantiate(DefeatScreen, new Vector3(0, 0, -1), Quaternion.identity);
             }
         }
     }
