@@ -21,6 +21,9 @@ public class PlayerInputs : MonoBehaviour
     private List<ShakeRequest> allShakeRequest = new List<ShakeRequest>();
 
     [SerializeField]
+    InputActionAsset playerInputsAction;
+
+    [SerializeField]
     ParticleSystem vfxTemplate;
 
     [SerializeField]
@@ -92,6 +95,7 @@ public class PlayerInputs : MonoBehaviour
     public void EnableVFX(Color color)
     {
         currentVFX = Instantiate(vfxTemplate, transform);
+        currentVFX.transform.position = new Vector3(transform.position.x, transform.position.y, -5);
         currentVFX.startColor = color;
 
         for (int child = 0; child < currentVFX.transform.childCount; child++)
