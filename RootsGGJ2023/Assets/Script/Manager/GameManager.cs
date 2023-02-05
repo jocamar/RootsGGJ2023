@@ -48,10 +48,14 @@ public class GameManager : MonoBehaviour
     bool printedPlayerStartMoveMsg = false;
     bool printedStartVoteMsg = false;
     bool printedStartDiscussionMsg = false;
+    public GameObject NutrientsMessage;
+
+    public List<GameObject> Player_UIs;
 
     public string CloseingEyes;
     public string ImpostorDisplay;
     TextMeshProUGUI PlayerMessage_text;
+    TextMeshProUGUI PlayerNutrients_text;
 
     int PLAYERNUMBER_MAX = 4;
     public int PlayerMaxNumber { get { return PLAYERNUMBER_MAX; } }
@@ -62,6 +66,8 @@ public class GameManager : MonoBehaviour
     int currentPositionY;
     int totalMoves = 30;
     int currBlockedPlayer = -1;
+
+    float mapTileScale = 0.5f;
 
     public static GameManager instance;
     private void Awake()
@@ -81,6 +87,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         PlayerMessage_text = PlayerMessage.GetComponent<TextMeshProUGUI>();
+        PlayerNutrients_text = NutrientsMessage.GetComponent<TextMeshProUGUI>();
     }
 
     public void StartPlayerSelection()
@@ -96,18 +103,22 @@ public class GameManager : MonoBehaviour
 
     int[] GetRandomOrder()
     {
-        int[] array = { 0, 1, 2, 3 };
-        for (int i = 0; i < array.Length; i++)
+        List<int> playerArray = new List<int>();
+
+        for (int p = 0; p < players.Count; p++)
+            playerArray.Add(p);
+
+        for (int i = 0; i < playerArray.Count; i++)
         {
-            int temp = array[i];
-            int randomIndex = Random.Range(i, array.Length);
-            array[i] = array[randomIndex];
-            array[randomIndex] = temp;
+            int temp = playerArray[i];
+            int randomIndex = Random.Range(i, playerArray.Count);
+            playerArray[i] = playerArray[randomIndex];
+            playerArray[randomIndex] = temp;
         }
-        return array;
+        return playerArray.ToArray();
     }
 
-    public void Reset()
+    public void ResetManager()
     {
         mapGenerated = false;
         players.Clear();
@@ -152,8 +163,8 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        float originX = -2.5f;
-        float originY = -2f;
+        float originX = -3f;
+        float originY = -3f;
 
         if (currentGameState == GameState.SELECTING_SABOTEUR)
         {
@@ -182,14 +193,24 @@ public class GameManager : MonoBehaviour
                 currentSaboteurSelectionPlayer++;
                 currentWaitTime = 1.0f;
 
-                if (currentSaboteurSelectionPlayer >= 4)
+                if (currentSaboteurSelectionPlayer >= players.Count)
+                {
                     currentGameState = GameState.GAMEPLAY;
+                    PlayerNutrients_text.text = "" + totalMoves;
+                }
             }
         }
         else if (currentGameState == GameState.GAMEPLAY)
         {
             if (startingGameplayState)
             {
+                PlayerMessage_text.text = "";
+
+                for (int i = 0; i < players.Count; i++)
+                {
+                    Player_UIs[i].GetComponent<PlayerInGameUI>().Initialize(players[i]);
+                }
+
                 if (!mapGenerated)
                 {
                     mapObject = Instantiate(mapPrefab);
@@ -204,25 +225,25 @@ public class GameManager : MonoBehaviour
                         {
                             if (map.GetTile(x, y).type == Map.TileType.Obstacle)
                             {
-                                var obj = Instantiate(obstacleTile, new Vector3(originX + x * 0.3f, originY + y * 0.3f), Quaternion.identity);
+                                var obj = Instantiate(obstacleTile, new Vector3(originX + x * mapTileScale, originY + y * mapTileScale), Quaternion.identity);
                                 map.SetObject(x, y, obj);
                             }
 
                             if (map.GetTile(x, y).type == Map.TileType.Empty)
                             {
-                                var obj = Instantiate(emptyTile, new Vector3(originX + x * 0.3f, originY + y * 0.3f), Quaternion.identity);
+                                var obj = Instantiate(emptyTile, new Vector3(originX + x * mapTileScale, originY + y * mapTileScale), Quaternion.identity);
                                 map.SetObject(x, y, obj);
                             }
 
                             if (map.GetTile(x, y).type == Map.TileType.Start)
                             {
-                                var obj = Instantiate(startTile, new Vector3(originX + x * 0.3f, originY + y * 0.3f), Quaternion.identity);
+                                var obj = Instantiate(startTile, new Vector3(originX + x * mapTileScale, originY + y * mapTileScale), Quaternion.identity);
                                 map.SetObject(x, y, obj);
                             }
 
                             if (map.GetTile(x, y).type == Map.TileType.End)
                             {
-                                var obj = Instantiate(endTile, new Vector3(originX + x * 0.3f, originY + y * 0.3f), Quaternion.identity);
+                                var obj = Instantiate(endTile, new Vector3(originX + x * mapTileScale, originY + y * mapTileScale), Quaternion.identity);
                                 map.SetObject(x, y, obj);
                             }
                         }
@@ -246,67 +267,84 @@ public class GameManager : MonoBehaviour
             {
                 if (!printedPlayerStartMoveMsg)
                 {
-                    Debug.Log("Player " + (playerOrder[currentGameplayPlayer] + 1) + " make your move!");
+                    if (playerOrder[currentGameplayPlayer] != currBlockedPlayer)
+                    {
+                        Player_UIs[playerOrder[currentGameplayPlayer]].GetComponent<PlayerInGameUI>().StartMoving();
+                        Debug.Log("Player " + (playerOrder[currentGameplayPlayer] + 1) + " make your move!");
+                    }
+
                     printedPlayerStartMoveMsg = true;
                     players[playerOrder[currentGameplayPlayer]].movesForCurrentRound.Clear();
                 }
 
-                if (movement.action.triggered)
+                if (playerOrder[currentGameplayPlayer] != currBlockedPlayer)
                 {
-                    Debug.Log("Triggered move for player " + playerOrder[currentGameplayPlayer] + "!");
+                    if (movement.action.triggered)
+                    {
+                        Debug.Log("Triggered move for player " + playerOrder[currentGameplayPlayer] + "!");
 
-                    Player player = players[playerOrder[currentGameplayPlayer]];
-                    Player.MoveDirections moveDirection = player.playerInputs.movementOutput switch 
-                    { 
-                        Vector2 v when v.Equals(Vector2.up) => Player.MoveDirections.UP,
-                        Vector2 v when v.Equals(Vector2.down) => Player.MoveDirections.DOWN,
-                        Vector2 v when v.Equals(Vector2.left) => Player.MoveDirections.LEFT,
-                        Vector2 v when v.Equals(Vector2.right) => Player.MoveDirections.RIGHT,
-                        _ => Player.MoveDirections.NONE,
-                    };
+                        Player player = players[playerOrder[currentGameplayPlayer]];
+                        Player.MoveDirections moveDirection = player.playerInputs.movementOutput switch
+                        {
+                            Vector2 v when v.Equals(Vector2.up) => Player.MoveDirections.UP,
+                            Vector2 v when v.Equals(Vector2.down) => Player.MoveDirections.DOWN,
+                            Vector2 v when v.Equals(Vector2.left) => Player.MoveDirections.LEFT,
+                            Vector2 v when v.Equals(Vector2.right) => Player.MoveDirections.RIGHT,
+                            _ => Player.MoveDirections.NONE,
+                        };
 
-                    if (moveDirection != Player.MoveDirections.NONE) player.movesForCurrentRound.Add(moveDirection);
-                    if (player.isDisrupt == true)
-                {
-                    int moveCount = player.movesForCurrentRound.Count;
-                    int replacedMove = Random.Range(0, moveCount);
-                    int randomMove = Random.Range(0, 3);
-                    switch (randomMove) {
-                        case 0:
-                            player.movesForCurrentRound.RemoveAt(replacedMove);
-                            player.movesForCurrentRound.Insert (replacedMove, Player.MoveDirections.UP);
-                                break;
-                        case 1:
-                            player.movesForCurrentRound.RemoveAt(replacedMove);
-                            player.movesForCurrentRound.Insert(replacedMove, Player.MoveDirections.DOWN);
-                                break;
-                        case 2:
-                            player.movesForCurrentRound.RemoveAt(replacedMove);
-                            player.movesForCurrentRound.Insert(replacedMove, Player.MoveDirections.LEFT);
-                                break;
-                        case 3:
-                            player.movesForCurrentRound.RemoveAt(replacedMove);
-                            player.movesForCurrentRound.Insert(replacedMove, Player.MoveDirections.RIGHT);
-                                break;
+                        if (moveDirection != Player.MoveDirections.NONE) player.movesForCurrentRound.Add(moveDirection);
+                        if (player.isDisrupt == true)
+                        {
+                            int moveCount = player.movesForCurrentRound.Count;
+                            int replacedMove = Random.Range(0, moveCount);
+                            int randomMove = Random.Range(0, 3);
+                            switch (randomMove)
+                            {
+                                case 0:
+                                    player.movesForCurrentRound.RemoveAt(replacedMove);
+                                    player.movesForCurrentRound.Insert(replacedMove, Player.MoveDirections.UP);
+                                    break;
+                                case 1:
+                                    player.movesForCurrentRound.RemoveAt(replacedMove);
+                                    player.movesForCurrentRound.Insert(replacedMove, Player.MoveDirections.DOWN);
+                                    break;
+                                case 2:
+                                    player.movesForCurrentRound.RemoveAt(replacedMove);
+                                    player.movesForCurrentRound.Insert(replacedMove, Player.MoveDirections.LEFT);
+                                    break;
+                                case 3:
+                                    player.movesForCurrentRound.RemoveAt(replacedMove);
+                                    player.movesForCurrentRound.Insert(replacedMove, Player.MoveDirections.RIGHT);
+                                    break;
+                            }
+                        }
                     }
-
-                }
                 }
 
-                if ((players[playerOrder[currentGameplayPlayer]].playerInputs.playerSelect_Down && players[playerOrder[currentGameplayPlayer]].movesForCurrentRound.Count >= 1) || players[playerOrder[currentGameplayPlayer]].movesForCurrentRound.Count >= 3)
+                if ((players[playerOrder[currentGameplayPlayer]].playerInputs.playerSelect_Down && players[playerOrder[currentGameplayPlayer]].movesForCurrentRound.Count >= 1)
+                        || players[playerOrder[currentGameplayPlayer]].movesForCurrentRound.Count >= 3
+                        || playerOrder[currentGameplayPlayer] == currBlockedPlayer)
                 {
+                    Player_UIs[playerOrder[currentGameplayPlayer]].GetComponent<PlayerInGameUI>().StopMoving();
                     Debug.Log("Player " + (playerOrder[currentGameplayPlayer] + 1) + " has finished!");
                     currentGameplayPlayer++;
 
-
-                    if (currentGameplayPlayer == currBlockedPlayer)
-                        currentGameplayPlayer++;
-
-                    printedPlayerStartMoveMsg = false;
-
-                    if (currentGameplayPlayer >= 4)
+                    if (currentGameplayPlayer >= players.Count)
                     {
                         currentGameState = GameState.PATH_REVEAL;
+                    }
+                    else
+                    {
+                        if (playerOrder[currentGameplayPlayer] == currBlockedPlayer)
+                            currentGameplayPlayer++;
+
+                        printedPlayerStartMoveMsg = false;
+
+                        if (currentGameplayPlayer >= players.Count)
+                        {
+                            currentGameState = GameState.PATH_REVEAL;
+                        }
                     }
                 }
             }
@@ -318,6 +356,9 @@ public class GameManager : MonoBehaviour
             {
                 completePath.AddRange(players[i].movesForCurrentRound);
             }
+
+            foreach (GameObject obj in Player_UIs)
+                obj.GetComponent<PlayerInGameUI>().StopBlock();
 
             foreach (Player.MoveDirections dir in completePath)
             {
@@ -350,7 +391,7 @@ public class GameManager : MonoBehaviour
                         newTile.type = Map.TileType.Root;
                         map.SetTile(currentPositionX, currentPositionY, newTile);
 
-                        var newObj = Instantiate(rootTile, new Vector3(originX + currentPositionX * 0.3f, originY + currentPositionY * 0.3f), Quaternion.identity);
+                        var newObj = Instantiate(rootTile, new Vector3(originX + currentPositionX * mapTileScale, originY + currentPositionY * mapTileScale), Quaternion.identity);
                         map.SetObject(currentPositionX, currentPositionY, newObj);
                     }
                     else if (map.GetTile(newX, newY).type == Map.TileType.End)
@@ -361,6 +402,8 @@ public class GameManager : MonoBehaviour
                 }
 
                 totalMoves--;
+
+                PlayerNutrients_text.text = ""+totalMoves;
 
                 if (totalMoves <= 0)
                 {
@@ -399,45 +442,40 @@ public class GameManager : MonoBehaviour
             {
                 Debug.Log("Start Voting!");
                 printedStartVoteMsg = true;
+
+                for (int i = 0; i < players.Count; i++)
+                    Player_UIs[i].GetComponent<PlayerInGameUI>().StartVoting();
             }
 
             if (movement.action.triggered)
             {
-                Debug.Log("Triggered select vote!");
-                switch (movement.action.ReadValue<Vector2>())
+                foreach (Player p in players)
                 {
-                    case Vector2 v when v.Equals(Vector2.up):
-                        players[0].currentlySelectedVotePlayer = (players[0].currentlySelectedVotePlayer+1) % (PLAYERNUMBER_MAX+1);
-                        break;
+                    if (p.lockedVote)
+                        continue;
 
-                    case Vector2 v when v.Equals(Vector2.down):
-                        players[0].currentlySelectedVotePlayer = (players[0].currentlySelectedVotePlayer - 1) % (PLAYERNUMBER_MAX+1);
-                        break;
+                    Player.MoveDirections moveDirection = p.playerInputs.movementOutput switch
+                    {
+                        Vector2 v when v.Equals(Vector2.up) => Player.MoveDirections.UP,
+                        Vector2 v when v.Equals(Vector2.down) => Player.MoveDirections.DOWN,
+                        _ => Player.MoveDirections.NONE,
+                    };
+
+                    if (moveDirection == Player.MoveDirections.UP) p.currentlySelectedVotePlayer = (p.currentlySelectedVotePlayer + 1) % (PLAYERNUMBER_MAX + 1);
+                    if (moveDirection == Player.MoveDirections.DOWN) p.currentlySelectedVotePlayer = (p.currentlySelectedVotePlayer - 1) % (PLAYERNUMBER_MAX + 1);
                 }
+                
+
+                Debug.Log("Triggered select vote!");
             }
 
-            if (Input.GetKeyDown("joystick 1 button 0"))
+            foreach (Player p in players)
             {
-                Debug.Log("Player 1 locked vote!");
-                players[0].lockedVote = true;
-            }
-
-            if (Input.GetKeyDown("joystick 2 button 0"))
-            {
-                Debug.Log("Player 2 locked vote!");
-                players[1].lockedVote = true;
-            }
-
-            if (Input.GetKeyDown("joystick 3 button 0"))
-            {
-                Debug.Log("Player 3 locked vote!");
-                players[2].lockedVote = true;
-            }
-
-            if (Input.GetKeyDown("joystick 4 button 0"))
-            {
-                Debug.Log("Player 4 locked vote!");
-                players[3].lockedVote = true;
+                if (p.playerInputs.playerSelect_Down)
+                {
+                    Debug.Log("Player " + (p.playerIndex+1) + " locked vote!");
+                    p.lockedVote = true;
+                }
             }
 
             if (currentWaitTime <= 0.0f || AllPlayersLockedVote())
@@ -447,7 +485,12 @@ public class GameManager : MonoBehaviour
                 {
                     Debug.Log("Player " + mostVotedPlayer + " was blocked!");
                     currBlockedPlayer = mostVotedPlayer;
+                    if (currBlockedPlayer < Player_UIs.Count)
+                        Player_UIs[currBlockedPlayer].GetComponent<PlayerInGameUI>().StartBlock();
                 }
+
+                for (int i = 0; i < players.Count; i++)
+                    Player_UIs[i].GetComponent<PlayerInGameUI>().StopVoting();
 
                 foreach (Player p in players)
                 {
@@ -478,7 +521,7 @@ public class GameManager : MonoBehaviour
         int[] votes = { 0, 0, 0, 0 };
         foreach (Player p in players)
         {
-            if (p.lockedVote)
+            if (p.lockedVote && p.currentlySelectedVotePlayer < votes.Length)
                 votes[p.currentlySelectedVotePlayer]++;
         }
 
@@ -496,23 +539,27 @@ public class GameManager : MonoBehaviour
             return false;
         }
 
-        highest = array[0];
+        
+        int highestVal = array[0];
+        highest = 0;
+
         for (int i = 1; i < array.Length; i++)
         {
-            if (array[i] > highest)
+            if (array[i] > highestVal)
             {
-                highest = array[i];
+                highestVal = array[i];
+                highest = i;
             }
         }
 
         for (int i = 0; i < array.Length; i++)
         {
-            if (array[i] != highest)
+            if (array[i] == highestVal && i != highest)
             {
-                return true;
+                return false;
             }
         }
 
-        return false;
+        return true;
     }
 }
