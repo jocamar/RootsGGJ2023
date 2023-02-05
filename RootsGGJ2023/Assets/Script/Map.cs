@@ -155,7 +155,7 @@ public class Map : MonoBehaviour
 
         while (true)
         {
-            GenerateObstacles(15);
+            GenerateObstacles(12);
             if (IsReachable(myStartX, myStartY, myEndX, myEndY))
                break;
 
