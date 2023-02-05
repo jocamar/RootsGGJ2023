@@ -323,6 +323,7 @@ public class GameManager : MonoBehaviour
                             Debug.Log("Triggered move for player " + playerOrder[currentGameplayPlayer] + "!");
 
                             Player player = players[playerOrder[currentGameplayPlayer]];
+                            
                             Player.MoveDirections moveDirection = player.playerInputs.movementOutput switch
                             {
                                 Vector2 v when v.Equals(Vector2.up) => Player.MoveDirections.UP,

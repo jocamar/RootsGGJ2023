@@ -125,7 +125,7 @@ MonoBehaviour:
   playerSelect: 0
   playerSelect_Down: 1
   playerSabotage: 0
-  playerSabotage_Down: 0
+  playerSabotage_Down: 1
   movementReset: 1
   playerInput: {fileID: 0}
-  movementOutput: {x: 1, y: 0}
+  movementOutput: {x: -1, y: 0}
