@@ -65,7 +65,7 @@ public class Menu_PlayerSelection : MonoBehaviour
 
     void CreateNewPlayer(PlayerInputs player)
     {
-        GameManager.instance.AddNewPlayer(player);
+        GameManager.instance.AddNewPlayer(player, playerSpriteColorsSelection[GameManager.instance.GetCurrentPlayerNumber()]);
     }
 
     void UpdatePlayerUI()
