@@ -27,6 +27,9 @@ public class Menu_PlayerSelection : MonoBehaviour
     [SerializeField]
     Image launchGameLoading;
 
+    [SerializeField]
+    float textPlayerNumberPositionOffset = -200;
+
     private float percentageLaunchGame;
 
     private List<Image> playerSprites = new List<Image>();
@@ -77,8 +80,15 @@ public class Menu_PlayerSelection : MonoBehaviour
     {
         int index = GameManager.instance.GetCurrentPlayerNumber();
         playerSprites.Add(Instantiate(playerSprite, Root_PlayerSprites));
-        playerNumbers.Add(Instantiate(playerNumber, Root_PlayerSprites));
-        playerNumbers[index - 1].text = $"Player {index}";
-        playerSprites[index].color = playerSpriteColorsSelection[index-1];
+        playerNumbers.Add(Instantiate(playerNumber, playerSprites[index].transform));
+
+        Color color = playerSpriteColorsSelection[index - 1];
+
+        Text playerText = playerNumbers[index];
+        playerText.text = $"Player {index}";
+        playerText.transform.localPosition = new Vector3(playerText.transform.position.x, playerText.transform.position.y + textPlayerNumberPositionOffset, 0);
+        playerText.color = color;
+
+        playerSprites[index].color = color;
     }
 }
