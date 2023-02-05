@@ -56,6 +56,7 @@ public class GameManager : MonoBehaviour
     public string ImpostorDisplay;
     public string Discuss;
     public int discussionTimer;
+    int Displaytimer;
     TextMeshProUGUI PlayerMessage_text;
     TextMeshProUGUI PlayerNutrients_text;
 
@@ -352,10 +353,24 @@ public class GameManager : MonoBehaviour
             }
         if (currentGameState == GameState.DISCUSSION)
         {
-
+            Displaytimer = discussionTimer*1000;
+            System.Timers.Timer discusstimer = new System.Timers.Timer();
+            discusstimer.Interval = 1000;
+            discusstimer.Elapsed += new System.Timers.ElapsedEventHandler(OnTimedEvent);
+            discusstimer.Enabled = true;
+            PlayerMessage_text.text = Discuss + Displaytimer;
+            void OnTimedEvent (object source, System.Timers.ElapsedEventArgs e)
+            {
+                Displaytimer = Displaytimer - 1000;
+                if (Displaytimer >= 0)
+                {
+                    currentGameState = GameState.VOTING;
+                }
+            }
         }
     }
-        else if (currentGameState == GameState.PATH_REVEAL)
+
+    if(currentGameState == GameState.PATH_REVEAL)
         {
             List<Player.MoveDirections> completePath = new List<Player.MoveDirections>();
             foreach (int i in playerOrder)
