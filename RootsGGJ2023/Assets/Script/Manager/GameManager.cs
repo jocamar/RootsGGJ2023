@@ -69,6 +69,9 @@ public class GameManager : MonoBehaviour
 
     float mapTileScale = 0.5f;
 
+    Player.MoveDirections lastMoveDirection = Player.MoveDirections.NONE;
+    GameObject lastRootTile = null;
+
     public static GameManager instance;
     private void Awake()
     {
@@ -97,6 +100,7 @@ public class GameManager : MonoBehaviour
 
     public void StartGame()
     {
+        lastMoveDirection = Player.MoveDirections.NONE;
         currentGameState = GameState.SELECTING_SABOTEUR;
         GameManagerUI.SetActive(true);
     }
@@ -135,6 +139,8 @@ public class GameManager : MonoBehaviour
         totalMoves = 30;
         Destroy(mapObject);
         currBlockedPlayer = -1;
+        lastMoveDirection = Player.MoveDirections.NONE;
+        lastRootTile = null;
     }
 
     public int GetCurrentPlayerNumber()
@@ -294,31 +300,6 @@ public class GameManager : MonoBehaviour
                         };
 
                         if (moveDirection != Player.MoveDirections.NONE) player.movesForCurrentRound.Add(moveDirection);
-                        if (player.isDisrupt == true)
-                        {
-                            int moveCount = player.movesForCurrentRound.Count;
-                            int replacedMove = Random.Range(0, moveCount);
-                            int randomMove = Random.Range(0, 3);
-                            switch (randomMove)
-                            {
-                                case 0:
-                                    player.movesForCurrentRound.RemoveAt(replacedMove);
-                                    player.movesForCurrentRound.Insert(replacedMove, Player.MoveDirections.UP);
-                                    break;
-                                case 1:
-                                    player.movesForCurrentRound.RemoveAt(replacedMove);
-                                    player.movesForCurrentRound.Insert(replacedMove, Player.MoveDirections.DOWN);
-                                    break;
-                                case 2:
-                                    player.movesForCurrentRound.RemoveAt(replacedMove);
-                                    player.movesForCurrentRound.Insert(replacedMove, Player.MoveDirections.LEFT);
-                                    break;
-                                case 3:
-                                    player.movesForCurrentRound.RemoveAt(replacedMove);
-                                    player.movesForCurrentRound.Insert(replacedMove, Player.MoveDirections.RIGHT);
-                                    break;
-                            }
-                        }
                     }
                 }
 
@@ -352,16 +333,66 @@ public class GameManager : MonoBehaviour
         else if (currentGameState == GameState.PATH_REVEAL)
         {
             List<Player.MoveDirections> completePath = new List<Player.MoveDirections>();
+            Player.MoveDirections tentativeLastMoveDir = Player.MoveDirections.NONE;
             foreach (int i in playerOrder)
             {
+                if (players[i].movesForCurrentRound.Count <= 0)
+                    continue;
+
+                if (players[i].isDisrupt == true)
+                {
+                    int moveCount = players[i].movesForCurrentRound.Count;
+                    int replacedMove = Random.Range(0, moveCount);
+
+                    Player.MoveDirections blockedDirection = tentativeLastMoveDir != Player.MoveDirections.NONE ? tentativeLastMoveDir : lastMoveDirection;
+
+
+                    int randomMove;
+
+                    do
+                    {
+                        randomMove = Random.Range(0, 3);
+                    }
+                    while (randomMove == (int)blockedDirection);
+
+                    switch (randomMove)
+                    {
+                        case 0:
+                            players[i].movesForCurrentRound.RemoveAt(replacedMove);
+                            players[i].movesForCurrentRound.Insert(replacedMove, Player.MoveDirections.UP);
+                            break;
+                        case 1:
+                            players[i].movesForCurrentRound.RemoveAt(replacedMove);
+                            players[i].movesForCurrentRound.Insert(replacedMove, Player.MoveDirections.DOWN);
+                            break;
+                        case 2:
+                            players[i].movesForCurrentRound.RemoveAt(replacedMove);
+                            players[i].movesForCurrentRound.Insert(replacedMove, Player.MoveDirections.LEFT);
+                            break;
+                        case 3:
+                            players[i].movesForCurrentRound.RemoveAt(replacedMove);
+                            players[i].movesForCurrentRound.Insert(replacedMove, Player.MoveDirections.RIGHT);
+                            break;
+                    }
+                }
+
+                tentativeLastMoveDir = players[i].movesForCurrentRound[players[i].movesForCurrentRound.Count - 1];
                 completePath.AddRange(players[i].movesForCurrentRound);
             }
 
             foreach (GameObject obj in Player_UIs)
                 obj.GetComponent<PlayerInGameUI>().StopBlock();
 
-            foreach (Player.MoveDirections dir in completePath)
+            for (int i = 0; i < completePath.Count; i++)
             {
+                Player.MoveDirections dir = completePath[i];
+                Player.MoveDirections dirAfter = i < completePath.Count - 1 ? completePath[i + 1] : Player.MoveDirections.NONE;
+
+                if (i == 0 && lastRootTile != null)
+                {
+                    lastRootTile.GetComponent<RootSpriteController>().ChangeNextDir(dir);
+                }
+
                 int newX = currentPositionX;
                 int newY = currentPositionY;
                 if (dir == Player.MoveDirections.DOWN)
@@ -385,6 +416,7 @@ public class GameManager : MonoBehaviour
                 {
                     if (map.GetTile(newX, newY).type == Map.TileType.Empty)
                     {
+                        lastMoveDirection = dir;
                         currentPositionX = newX;
                         currentPositionY = newY;
                         Map.Tile newTile = new Map.Tile();
@@ -392,7 +424,11 @@ public class GameManager : MonoBehaviour
                         map.SetTile(currentPositionX, currentPositionY, newTile);
 
                         var newObj = Instantiate(rootTile, new Vector3(originX + currentPositionX * mapTileScale, originY + currentPositionY * mapTileScale), Quaternion.identity);
+                        newObj.GetComponent<RootSpriteController>().SetMoveDirections(dir, dirAfter);
                         map.SetObject(currentPositionX, currentPositionY, newObj);
+
+                        if (dirAfter == Player.MoveDirections.NONE)
+                            lastRootTile = newObj;
                     }
                     else if (map.GetTile(newX, newY).type == Map.TileType.End)
                     {
