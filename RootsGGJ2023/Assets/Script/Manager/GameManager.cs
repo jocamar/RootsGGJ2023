@@ -48,7 +48,6 @@ public class GameManager : MonoBehaviour
     bool printedPlayerStartMoveMsg = false;
     bool printedStartVoteMsg = false;
     bool printedStartDiscussionMsg = false;
-    public GameObject PlayerMessage;
     public GameObject NutrientsMessage;
 
     public List<GameObject> Player_UIs;
@@ -294,32 +293,33 @@ public class GameManager : MonoBehaviour
                             _ => Player.MoveDirections.NONE,
                         };
 
-                    if (moveDirection != Player.MoveDirections.NONE) player.movesForCurrentRound.Add(moveDirection);
-                    if (player.isDisrupt == true)
-                {
-                    int moveCount = player.movesForCurrentRound.Count;
-                    int replacedMove = Random.Range(0, moveCount);
-                    int randomMove = Random.Range(0, 3);
-                    switch (randomMove) {
-                        case 0:
-                            player.movesForCurrentRound.RemoveAt(replacedMove);
-                            player.movesForCurrentRound.Insert (replacedMove, Player.MoveDirections.UP);
-                                break;
-                        case 1:
-                            player.movesForCurrentRound.RemoveAt(replacedMove);
-                            player.movesForCurrentRound.Insert(replacedMove, Player.MoveDirections.DOWN);
-                                break;
-                        case 2:
-                            player.movesForCurrentRound.RemoveAt(replacedMove);
-                            player.movesForCurrentRound.Insert(replacedMove, Player.MoveDirections.LEFT);
-                                break;
-                        case 3:
-                            player.movesForCurrentRound.RemoveAt(replacedMove);
-                            player.movesForCurrentRound.Insert(replacedMove, Player.MoveDirections.RIGHT);
-                                break;
+                        if (moveDirection != Player.MoveDirections.NONE) player.movesForCurrentRound.Add(moveDirection);
+                        if (player.isDisrupt == true)
+                        {
+                            int moveCount = player.movesForCurrentRound.Count;
+                            int replacedMove = Random.Range(0, moveCount);
+                            int randomMove = Random.Range(0, 3);
+                            switch (randomMove)
+                            {
+                                case 0:
+                                    player.movesForCurrentRound.RemoveAt(replacedMove);
+                                    player.movesForCurrentRound.Insert(replacedMove, Player.MoveDirections.UP);
+                                    break;
+                                case 1:
+                                    player.movesForCurrentRound.RemoveAt(replacedMove);
+                                    player.movesForCurrentRound.Insert(replacedMove, Player.MoveDirections.DOWN);
+                                    break;
+                                case 2:
+                                    player.movesForCurrentRound.RemoveAt(replacedMove);
+                                    player.movesForCurrentRound.Insert(replacedMove, Player.MoveDirections.LEFT);
+                                    break;
+                                case 3:
+                                    player.movesForCurrentRound.RemoveAt(replacedMove);
+                                    player.movesForCurrentRound.Insert(replacedMove, Player.MoveDirections.RIGHT);
+                                    break;
+                            }
+                        }
                     }
-
-                }
                 }
 
                 if ((players[playerOrder[currentGameplayPlayer]].playerInputs.playerSelect_Down && players[playerOrder[currentGameplayPlayer]].movesForCurrentRound.Count >= 1)
