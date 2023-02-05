@@ -36,6 +36,8 @@ public class GameManager : MonoBehaviour
     public GameObject mapPrefab;
     public GameObject PlayerMessage;
     public GameObject DiscussMessage;
+    public GameObject VictoryScreen;
+    public GameObject DefeatScreen;
 
     public GameObject P1OpenAudio;
     public GameObject P2OpenAudio;
@@ -60,6 +62,7 @@ public class GameManager : MonoBehaviour
     bool printedStartVoteMsg = false;
     bool printedStartDiscussionMsg = false;
     public GameObject NutrientsMessage;
+    public GameObject NutrientsLabel;
 
     public List<GameObject> Player_UIs;
 
@@ -86,6 +89,7 @@ public class GameManager : MonoBehaviour
 
     bool delayAfterPlayerMoved = false;
     bool saboteurHasUsedDisrupt = false;
+    bool SaboteurWins = false;
 
     Player.MoveDirections lastMoveDirection = Player.MoveDirections.NONE;
     GameObject lastRootTile = null;
@@ -110,6 +114,8 @@ public class GameManager : MonoBehaviour
         PlayerMessage_text = PlayerMessage.GetComponent<TextMeshProUGUI>();
         PlayerNutrients_text = NutrientsMessage.GetComponent<TextMeshProUGUI>();
         DiscussMessage_text = DiscussMessage.GetComponent<TextMeshProUGUI>();
+        NutrientsLabel.SetActive(false);
+        NutrientsMessage.SetActive(false);
     }
 
     public void StartPlayerSelection()
@@ -234,6 +240,7 @@ public class GameManager : MonoBehaviour
                     }
                     else
                     {
+                        PlayerMessage_text.color = Color.white;
                         PlayerMessage_text.text = "You are not the impostor! :)";
                         Debug.Log("You are not the impostor!");
                     }
@@ -248,13 +255,16 @@ public class GameManager : MonoBehaviour
             {
                 PlayerMessage_text.text = "";
 
-                for (int i = 0; i < players.Count; i++)
-                {
-                    Player_UIs[i].GetComponent<PlayerInGameUI>().Initialize(players[i], players.Count);
-                }
-
                 if (!mapGenerated)
                 {
+                    NutrientsLabel.SetActive(true);
+                    NutrientsMessage.SetActive(true);
+
+                    for (int i = 0; i < players.Count; i++)
+                    {
+                        Player_UIs[i].GetComponent<PlayerInGameUI>().Initialize(players[i], players.Count);
+                    }
+
                     mapObject = Instantiate(mapPrefab);
                     map = mapObject.GetComponent<Map>();
                     map.Initialize(this, 15, 15);
@@ -496,6 +506,7 @@ public class GameManager : MonoBehaviour
                     else if (map.GetTile(newX, newY).type == Map.TileType.End)
                     {
                         Debug.Log("Good guys lost!");
+                        SaboteurWins = false;
                         currentGameState = GameState.GAME_END;
                     }
                     else if (i >= completePath.Count - 1)
@@ -514,6 +525,7 @@ public class GameManager : MonoBehaviour
                 if (totalMoves <= 0)
                 {
                     Debug.Log("Good guys lost!");
+                    SaboteurWins = true;
                     currentGameState = GameState.GAME_END;
                 }
 
@@ -532,7 +544,7 @@ public class GameManager : MonoBehaviour
 
             currentWaitTime -= Time.deltaTime;
 
-            DiscussMessage_text.text = Discuss + currentWaitTime;
+            DiscussMessage_text.text = Discuss + string.Format("{0:0.0}", currentWaitTime);
 
             if (currentWaitTime <= 0.0f)
             {
@@ -615,6 +627,17 @@ public class GameManager : MonoBehaviour
                 saboteurHasUsedDisrupt = false;
                 currentGameplayPlayer = 0;
                 printedPlayerStartMoveMsg = false;
+            }
+        }
+        else if (currentGameState == GameState.GAME_END)
+        {
+            if (SaboteurWins == false)
+            { 
+                var screen = Instantiate(VictoryScreen, new Vector2(0, 0), Quaternion.identity);
+            }
+            else if (SaboteurWins == true)
+            {
+            var screen = Instantiate(DefeatScreen, new Vector2(0, 0), Quaternion.identity);
             }
         }
     }

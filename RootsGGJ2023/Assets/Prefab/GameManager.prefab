@@ -549,7 +549,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -757, y: 266}
+  m_AnchoredPosition: {x: -26.999983, y: 482.99994}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &435519075985002184
@@ -2087,6 +2087,7 @@ MonoBehaviour:
   P4CloseAudio: {fileID: 6016629550574440805}
   AllOpen: {fileID: 8112724592918940688}
   NutrientsMessage: {fileID: 5422639732891681471}
+  NutrientsLabel: {fileID: 1423133481380537248}
   Player_UIs:
   - {fileID: 345238280554724044}
   - {fileID: 5506771097118591158}
@@ -2933,7 +2934,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -588, y: 266}
+  m_AnchoredPosition: {x: 142, y: 483}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &519033157524683723
@@ -4125,8 +4126,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -2, y: -130}
-  m_SizeDelta: {x: -548, y: -370}
+  m_AnchoredPosition: {x: -19.467, y: -404.8318}
+  m_SizeDelta: {x: -609.07, y: -855.6635}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6027122514879814290
 CanvasRenderer:
