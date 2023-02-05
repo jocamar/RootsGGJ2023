@@ -36,6 +36,16 @@ public class GameManager : MonoBehaviour
     public GameObject mapPrefab;
     public GameObject PlayerMessage;
 
+    public GameObject P1OpenAudio;
+    public GameObject P2OpenAudio;
+    public GameObject P3OpenAudio;
+    public GameObject P4OpenAudio;
+    public GameObject P1CloseAudio;
+    public GameObject P2CloseAudio;
+    public GameObject P3CloseAudio;
+    public GameObject P4CloseAudio;
+    public GameObject AllOpen;
+
     List<Player> players = new List<Player>();
     GameState currentGameState = GameState.STARTMENU;
     float currentWaitTime = 0f;
@@ -70,6 +80,9 @@ public class GameManager : MonoBehaviour
     int currBlockedPlayer = -1;
 
     float mapTileScale = 0.5f;
+
+    bool delayAfterPlayerMoved = false;
+    bool saboteurHasUsedDisrupt = false;
 
     Player.MoveDirections lastMoveDirection = Player.MoveDirections.NONE;
     GameObject lastRootTile = null;
@@ -143,6 +156,8 @@ public class GameManager : MonoBehaviour
         currBlockedPlayer = -1;
         lastMoveDirection = Player.MoveDirections.NONE;
         lastRootTile = null;
+        delayAfterPlayerMoved = false;
+        saboteurHasUsedDisrupt = false;
     }
 
     public int GetCurrentPlayerNumber()
@@ -182,29 +197,43 @@ public class GameManager : MonoBehaviour
                 PlayerMessage_text.text = CloseingEyes;
                 startingSaboteurSelect = false;
                 randomImpostor = Random.Range(0, 4);
-                currentWaitTime = 1.0f;
+                currentWaitTime = 5.0f;
             }
 
             currentWaitTime -= Time.deltaTime;
 
             if (currentWaitTime <= 0.0f)
             {
-                Debug.Log("Player " + (currentSaboteurSelectionPlayer + 1) + " Open your eyes!");
-
-                if (currentSaboteurSelectionPlayer == randomImpostor)
-                {
-                    Debug.Log("You are the impostor!");
-                    PlayerMessage_text.text = ImpostorDisplay;
-                    Player player = players[randomImpostor];
-                    player.isSaboteur = true;
-                }
-                currentSaboteurSelectionPlayer++;
-                currentWaitTime = 1.0f;
-
                 if (currentSaboteurSelectionPlayer >= players.Count)
                 {
+                    AllOpen.GetComponent<AudioSource>().Play();
                     currentGameState = GameState.GAMEPLAY;
                     PlayerNutrients_text.text = "" + totalMoves;
+                }
+                else
+                {
+                    GameObject[] audiosOpen = { P1OpenAudio, P2OpenAudio, P3OpenAudio, P4OpenAudio };
+                    GameObject[] audiosClose = { P1CloseAudio, P2CloseAudio, P3CloseAudio, P4CloseAudio };
+
+                    Debug.Log("Player " + (currentSaboteurSelectionPlayer + 1) + " Open your eyes!");
+                    audiosOpen[currentSaboteurSelectionPlayer].GetComponent<AudioSource>().Play();
+                    if (currentSaboteurSelectionPlayer + 1 < players.Count)
+                        audiosClose[currentSaboteurSelectionPlayer].GetComponent<AudioSource>().PlayDelayed(3.0f);
+
+                    if (currentSaboteurSelectionPlayer == randomImpostor)
+                    {
+                        Debug.Log("You are the impostor!");
+                        PlayerMessage_text.text = ImpostorDisplay;
+                        Player player = players[randomImpostor];
+                        player.isSaboteur = true;
+                    }
+                    else
+                    {
+                        PlayerMessage_text.text = "You are not the impostor! :)";
+                        Debug.Log("You are not the impostor!");
+                    }
+                    currentSaboteurSelectionPlayer++;
+                    currentWaitTime = 6.0f;
                 }
             }
         }
@@ -273,69 +302,84 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                if (!printedPlayerStartMoveMsg)
+                if (!delayAfterPlayerMoved)
                 {
+                    if (!printedPlayerStartMoveMsg)
+                    {
+                        if (playerOrder[currentGameplayPlayer] != currBlockedPlayer)
+                        {
+                            Player_UIs[playerOrder[currentGameplayPlayer]].GetComponent<PlayerInGameUI>().StartMoving();
+                            Debug.Log("Player " + (playerOrder[currentGameplayPlayer] + 1) + " make your move!");
+                        }
+
+                        printedPlayerStartMoveMsg = true;
+                        players[playerOrder[currentGameplayPlayer]].movesForCurrentRound.Clear();
+                    }
+
                     if (playerOrder[currentGameplayPlayer] != currBlockedPlayer)
                     {
-                        Player_UIs[playerOrder[currentGameplayPlayer]].GetComponent<PlayerInGameUI>().StartMoving();
-                        Debug.Log("Player " + (playerOrder[currentGameplayPlayer] + 1) + " make your move!");
-                    }
-
-                    printedPlayerStartMoveMsg = true;
-                    players[playerOrder[currentGameplayPlayer]].movesForCurrentRound.Clear();
-                }
-
-                if (playerOrder[currentGameplayPlayer] != currBlockedPlayer)
-                {
-                    if (movement.action.triggered)
-                    {
-                        Debug.Log("Triggered move for player " + playerOrder[currentGameplayPlayer] + "!");
-
-                        Player player = players[playerOrder[currentGameplayPlayer]];
-                        Player.MoveDirections moveDirection = player.playerInputs.movementOutput switch
+                        if (movement.action.triggered)
                         {
-                            Vector2 v when v.Equals(Vector2.up) => Player.MoveDirections.UP,
-                            Vector2 v when v.Equals(Vector2.down) => Player.MoveDirections.DOWN,
-                            Vector2 v when v.Equals(Vector2.left) => Player.MoveDirections.LEFT,
-                            Vector2 v when v.Equals(Vector2.right) => Player.MoveDirections.RIGHT,
-                            _ => Player.MoveDirections.NONE,
-                        };
+                            Debug.Log("Triggered move for player " + playerOrder[currentGameplayPlayer] + "!");
 
-                        if (moveDirection != Player.MoveDirections.NONE) player.movesForCurrentRound.Add(moveDirection);
+                            Player player = players[playerOrder[currentGameplayPlayer]];
+                            Player.MoveDirections moveDirection = player.playerInputs.movementOutput switch
+                            {
+                                Vector2 v when v.Equals(Vector2.up) => Player.MoveDirections.UP,
+                                Vector2 v when v.Equals(Vector2.down) => Player.MoveDirections.DOWN,
+                                Vector2 v when v.Equals(Vector2.left) => Player.MoveDirections.LEFT,
+                                Vector2 v when v.Equals(Vector2.right) => Player.MoveDirections.RIGHT,
+                                _ => Player.MoveDirections.NONE,
+                            };
+
+                            if (moveDirection != Player.MoveDirections.NONE) player.movesForCurrentRound.Add(moveDirection);
+                        }
+                    }
+
+                    if ((players[playerOrder[currentGameplayPlayer]].playerInputs.playerSelect_Down && players[playerOrder[currentGameplayPlayer]].movesForCurrentRound.Count >= 1)
+                            || players[playerOrder[currentGameplayPlayer]].movesForCurrentRound.Count >= 3
+                            || playerOrder[currentGameplayPlayer] == currBlockedPlayer)
+                    {
+                        delayAfterPlayerMoved = true;
+                        currentWaitTime = 2.0f;
                     }
                 }
-
-                if ((players[playerOrder[currentGameplayPlayer]].playerInputs.playerSelect_Down && players[playerOrder[currentGameplayPlayer]].movesForCurrentRound.Count >= 1)
-                        || players[playerOrder[currentGameplayPlayer]].movesForCurrentRound.Count >= 3
-                        || playerOrder[currentGameplayPlayer] == currBlockedPlayer)
+                else
                 {
-                    Player_UIs[playerOrder[currentGameplayPlayer]].GetComponent<PlayerInGameUI>().StopMoving();
-                    Debug.Log("Player " + (playerOrder[currentGameplayPlayer] + 1) + " has finished!");
-                    currentGameplayPlayer++;
+                    currentWaitTime -= Time.deltaTime;
 
-                    if (currentGameplayPlayer >= players.Count)
+                    if (currentWaitTime <= 0.0f)
                     {
-                        currentGameState = GameState.PATH_REVEAL;
-                    }
-                    else
-                    {
-                        if (playerOrder[currentGameplayPlayer] == currBlockedPlayer)
-                            currentGameplayPlayer++;
-
-                        printedPlayerStartMoveMsg = false;
+                        Player_UIs[playerOrder[currentGameplayPlayer]].GetComponent<PlayerInGameUI>().StopMoving();
+                        Debug.Log("Player " + (playerOrder[currentGameplayPlayer] + 1) + " has finished!");
+                        currentGameplayPlayer++;
 
                         if (currentGameplayPlayer >= players.Count)
                         {
                             currentGameState = GameState.PATH_REVEAL;
                         }
+                        else
+                        {
+                            if (playerOrder[currentGameplayPlayer] == currBlockedPlayer)
+                                currentGameplayPlayer++;
+
+                            printedPlayerStartMoveMsg = false;
+
+                            if (currentGameplayPlayer >= players.Count)
+                            {
+                                currentGameState = GameState.PATH_REVEAL;
+                            }
+                        }
                     }
                 }
-            }
-        if (currentGameState == GameState.DISCUSSION)
-        {
 
+                if (!saboteurHasUsedDisrupt && players[randomImpostor].playerInputs.playerSabotage_Down)
+                {
+                    players[playerOrder[currentGameplayPlayer]].isDisrupt = true;
+                    saboteurHasUsedDisrupt = true;
+                }
+            }
         }
-    }
         else if (currentGameState == GameState.PATH_REVEAL)
         {
             List<Player.MoveDirections> completePath = new List<Player.MoveDirections>();
@@ -539,10 +583,12 @@ public class GameManager : MonoBehaviour
                     p.movesForCurrentRound.Clear();
                     p.currentlySelectedVotePlayer = 0;
                     p.lockedVote = false;
+                    p.isDisrupt = false;
                 }
 
                 currentGameState = GameState.GAMEPLAY;
                 startingGameplayState = true;
+                saboteurHasUsedDisrupt = false;
                 currentGameplayPlayer = 0;
             }
         }
