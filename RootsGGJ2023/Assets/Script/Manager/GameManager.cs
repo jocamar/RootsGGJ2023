@@ -36,6 +36,16 @@ public class GameManager : MonoBehaviour
     public GameObject mapPrefab;
     public GameObject PlayerMessage;
 
+    public GameObject P1OpenAudio;
+    public GameObject P2OpenAudio;
+    public GameObject P3OpenAudio;
+    public GameObject P4OpenAudio;
+    public GameObject P1CloseAudio;
+    public GameObject P2CloseAudio;
+    public GameObject P3CloseAudio;
+    public GameObject P4CloseAudio;
+    public GameObject AllOpen;
+
     List<Player> players = new List<Player>();
     GameState currentGameState = GameState.STARTMENU;
     float currentWaitTime = 0f;
@@ -182,29 +192,43 @@ public class GameManager : MonoBehaviour
                 PlayerMessage_text.text = CloseingEyes;
                 startingSaboteurSelect = false;
                 randomImpostor = Random.Range(0, 4);
-                currentWaitTime = 1.0f;
+                currentWaitTime = 5.0f;
             }
 
             currentWaitTime -= Time.deltaTime;
 
             if (currentWaitTime <= 0.0f)
             {
-                Debug.Log("Player " + (currentSaboteurSelectionPlayer + 1) + " Open your eyes!");
-
-                if (currentSaboteurSelectionPlayer == randomImpostor)
-                {
-                    Debug.Log("You are the impostor!");
-                    PlayerMessage_text.text = ImpostorDisplay;
-                    Player player = players[randomImpostor];
-                    player.isSaboteur = true;
-                }
-                currentSaboteurSelectionPlayer++;
-                currentWaitTime = 1.0f;
-
                 if (currentSaboteurSelectionPlayer >= players.Count)
                 {
+                    AllOpen.GetComponent<AudioSource>().Play();
                     currentGameState = GameState.GAMEPLAY;
                     PlayerNutrients_text.text = "" + totalMoves;
+                }
+                else
+                {
+                    GameObject[] audiosOpen = { P1OpenAudio, P2OpenAudio, P3OpenAudio, P4OpenAudio };
+                    GameObject[] audiosClose = { P1CloseAudio, P2CloseAudio, P3CloseAudio, P4CloseAudio };
+
+                    Debug.Log("Player " + (currentSaboteurSelectionPlayer + 1) + " Open your eyes!");
+                    audiosOpen[currentSaboteurSelectionPlayer].GetComponent<AudioSource>().Play();
+                    if (currentSaboteurSelectionPlayer + 1 < players.Count)
+                        audiosClose[currentSaboteurSelectionPlayer].GetComponent<AudioSource>().PlayDelayed(3.0f);
+
+                    if (currentSaboteurSelectionPlayer == randomImpostor)
+                    {
+                        Debug.Log("You are the impostor!");
+                        PlayerMessage_text.text = ImpostorDisplay;
+                        Player player = players[randomImpostor];
+                        player.isSaboteur = true;
+                    }
+                    else
+                    {
+                        PlayerMessage_text.text = "You are not the impostor! :)";
+                        Debug.Log("You are not the impostor!");
+                    }
+                    currentSaboteurSelectionPlayer++;
+                    currentWaitTime = 6.0f;
                 }
             }
         }
