@@ -31,6 +31,7 @@ public class PlayerInGameUI : MonoBehaviour
         playingLabel.SetActive(false);
         voteValue.SetActive(false);
         playerLabel.SetActive(true);
+        playerLabel.GetComponent<TextMeshProUGUI>().color = p.color;
         blockedLabel.SetActive(false);
     }
 

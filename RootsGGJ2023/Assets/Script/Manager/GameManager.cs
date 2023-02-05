@@ -229,6 +229,7 @@ public class GameManager : MonoBehaviour
                         Debug.Log("You are the impostor!");
                         PlayerMessage_text.text = ImpostorDisplay;
                         Player player = players[randomImpostor];
+                        PlayerMessage_text.color = player.color;
                         player.isSaboteur = true;
                     }
                     else
