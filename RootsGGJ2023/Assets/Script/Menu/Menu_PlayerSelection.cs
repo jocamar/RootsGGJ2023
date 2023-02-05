@@ -22,6 +22,9 @@ public class Menu_PlayerSelection : MonoBehaviour
     Text playerNumber;
 
     [SerializeField]
+    Text playerActionNeeded;
+
+    [SerializeField]
     Color[] playerSpriteColorsSelection;
 
     [SerializeField]
@@ -68,6 +71,11 @@ public class Menu_PlayerSelection : MonoBehaviour
         if (percentageLaunchGame == 1)
         {
             SceneGameManager.instance.StartGameScene();
+        }
+
+        if (GameManager.instance.GetCurrentPlayerNumber() == GameManager.instance.PlayerMaxNumber)
+        {
+            playerActionNeeded.text = "Start Game";
         }
     }
 
