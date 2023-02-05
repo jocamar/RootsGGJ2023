@@ -17,6 +17,12 @@ public class GrowVineScript : MonoBehaviour
 
     void Start()
     {
+        for (int child = 0; child < transform.childCount; child++)
+        {
+            MeshRenderer mesh = transform.GetChild(child).GetComponent<MeshRenderer>();
+            growVinesMeshes.Add(mesh);
+        }
+
         for(int i=0; i<growVinesMeshes.Count; i++)
         {
             for(int j=0; j<growVinesMeshes[i].materials.Length; j++)
