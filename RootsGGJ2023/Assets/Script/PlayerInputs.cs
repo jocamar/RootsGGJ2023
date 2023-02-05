@@ -20,6 +20,16 @@ public class PlayerInputs : MonoBehaviour
 
     private List<ShakeRequest> allShakeRequest = new List<ShakeRequest>();
 
+    [SerializeField]
+    ParticleSystem vfxTemplate;
+
+    [SerializeField]
+    float particleFloatSpeedMultiplier = 10f;
+
+    Vector2 vfxNewMove;
+
+    ParticleSystem currentVFX;
+
     public Gamepad gamepad => Gamepad.all.FirstOrDefault(g => playerInput.devices.Any(d => d.deviceId == g.deviceId));
 
     public static Vector2 SnapVector(Vector2 value)
@@ -48,6 +58,12 @@ public class PlayerInputs : MonoBehaviour
         if (movement == Vector2.zero) movementReset = true;
     }
 
+    public void PlayerVFX(InputAction.CallbackContext ctx)
+    {
+        Vector2 movement = ctx.ReadValue<Vector2>();
+        MoveVFX(movement);
+    }
+
     public void PlayerSelect(InputAction.CallbackContext ctx)
     {
         bool pastValue = playerSelect;
@@ -70,6 +86,23 @@ public class PlayerInputs : MonoBehaviour
             playerSabotage_Down = true;
             Shake();
         }
+    }
+
+    [System.Obsolete]
+    public void EnableVFX(Color color)
+    {
+        currentVFX = Instantiate(vfxTemplate, transform);
+        currentVFX.startColor = color;
+
+        for (int child = 0; child < currentVFX.transform.childCount; child++)
+        {
+            currentVFX.transform.GetChild(child).transform.GetComponent<ParticleSystem>().startColor = color;
+        }
+    }
+
+    public void MoveVFX(Vector2 movement)
+    {
+        vfxNewMove = movement;
     }
 
     public void Shake(float power = 0.5f, float time = 0.05f, float location = 0f)
@@ -142,5 +175,10 @@ public class PlayerInputs : MonoBehaviour
         playerSelect_Down = false;
         playerSabotage_Down = false;
         movementOutput = Vector2.zero;
+
+        if (currentVFX != null && vfxNewMove != Vector2.zero)
+        {
+            currentVFX.transform.Translate(vfxNewMove * particleFloatSpeedMultiplier * Time.deltaTime, Space.World);
+        }
     }
 }
