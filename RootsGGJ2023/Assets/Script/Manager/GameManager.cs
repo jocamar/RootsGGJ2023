@@ -36,6 +36,8 @@ public class GameManager : MonoBehaviour
     public GameObject mapPrefab;
     public GameObject PlayerMessage;
     public GameObject DiscussMessage;
+    public GameObject VictoryScreen;
+    public GameObject DefeatScreen;
 
     public GameObject P1OpenAudio;
     public GameObject P2OpenAudio;
@@ -86,6 +88,7 @@ public class GameManager : MonoBehaviour
 
     bool delayAfterPlayerMoved = false;
     bool saboteurHasUsedDisrupt = false;
+    bool SaboteurWins = false;
 
     Player.MoveDirections lastMoveDirection = Player.MoveDirections.NONE;
     GameObject lastRootTile = null;
@@ -200,7 +203,7 @@ public class GameManager : MonoBehaviour
                 Debug.Log("All players close your eyes!");
                 PlayerMessage_text.text = CloseingEyes;
                 startingSaboteurSelect = false;
-                randomImpostor = Random.Range(0, 4);
+                randomImpostor = Random.Range(0, players.Count);
                 currentWaitTime = 5.0f;
             }
 
@@ -229,6 +232,7 @@ public class GameManager : MonoBehaviour
                         Debug.Log("You are the impostor!");
                         PlayerMessage_text.text = ImpostorDisplay;
                         Player player = players[randomImpostor];
+                        PlayerMessage_text.color = player.color;
                         player.isSaboteur = true;
                     }
                     else
@@ -379,6 +383,7 @@ public class GameManager : MonoBehaviour
 
                 if (!saboteurHasUsedDisrupt && randomImpostor < players.Count && players[randomImpostor].playerInputs.playerSabotage_Down)
                 {
+                    Debug.Log("Saboteur used Disrupt!");
                     players[playerOrder[currentGameplayPlayer]].isDisrupt = true;
                     saboteurHasUsedDisrupt = true;
                 }
@@ -494,7 +499,15 @@ public class GameManager : MonoBehaviour
                     else if (map.GetTile(newX, newY).type == Map.TileType.End)
                     {
                         Debug.Log("Good guys lost!");
+                        SaboteurWins = false;
                         currentGameState = GameState.GAME_END;
+                    }
+                    else if (i >= completePath.Count - 1)
+                    {
+                        if (prevRootTile != null)
+                        {
+                            prevRootTile.GetComponent<RootSpriteController>().ChangeNextDir(Player.MoveDirections.NONE);
+                        }
                     }
                 }
 
@@ -505,6 +518,7 @@ public class GameManager : MonoBehaviour
                 if (totalMoves <= 0)
                 {
                     Debug.Log("Good guys lost!");
+                    SaboteurWins = true;
                     currentGameState = GameState.GAME_END;
                 }
 
@@ -606,6 +620,17 @@ public class GameManager : MonoBehaviour
                 saboteurHasUsedDisrupt = false;
                 currentGameplayPlayer = 0;
                 printedPlayerStartMoveMsg = false;
+            }
+        }
+        else if (currentGameState == GameState.GAME_END)
+        {
+            if (SaboteurWins == false)
+            { 
+                var screen = Instantiate(VictoryScreen, new Vector2(0, 0), Quaternion.identity);
+            }
+            else if (SaboteurWins == true)
+            {
+            var screen = Instantiate(DefeatScreen, new Vector2(0, 0), Quaternion.identity);
             }
         }
     }
