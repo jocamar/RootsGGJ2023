@@ -89,6 +89,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 1cc319c3-d750-4a06-8a6e-548778b41874
     m_ActionName: Inputs_Player/Movement[/DualShock4GamepadHID/dpad/up,/DualShock4GamepadHID/dpad/down,/DualShock4GamepadHID/dpad/left,/DualShock4GamepadHID/dpad/right,/Keyboard/upArrow,/Keyboard/downArrow,/Keyboard/leftArrow,/Keyboard/rightArrow,/DualShock4GamepadHID/leftStick,/DualShock4GamepadHID/rightStick]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 7206634111523251183}
+        m_TargetAssemblyTypeName: PlayerInputs, Assembly-CSharp
+        m_MethodName: PlayerSabotage
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 03be4313-c50d-46f7-8ad4-5b5e55e98efb
+    m_ActionName: Inputs_Player/Sabotage[/DualShock4GamepadHID/buttonNorth,/XInputControllerWindows/buttonNorth,/XInputControllerWindows/buttonNorth,/XInputControllerWindows/buttonNorth,/DualShock4GamepadHID/buttonWest,/XInputControllerWindows/buttonWest,/XInputControllerWindows/buttonWest,/XInputControllerWindows/buttonWest,/DualShock4GamepadHID/buttonEast,/XInputControllerWindows/buttonEast,/XInputControllerWindows/buttonEast,/XInputControllerWindows/buttonEast]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Inputs_Player
@@ -108,6 +124,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerSelect: 0
   playerSelect_Down: 1
+  playerSabotage: 0
+  playerSabotage_Down: 0
   movementReset: 1
   playerInput: {fileID: 0}
   movementOutput: {x: 1, y: 0}

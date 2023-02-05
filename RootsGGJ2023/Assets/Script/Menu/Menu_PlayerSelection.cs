@@ -19,6 +19,9 @@ public class Menu_PlayerSelection : MonoBehaviour
     Image playerSprite;
 
     [SerializeField]
+    Text playerNumber;
+
+    [SerializeField]
     Color[] playerSpriteColorsSelection;
 
     [SerializeField]
@@ -27,12 +30,14 @@ public class Menu_PlayerSelection : MonoBehaviour
     private float percentageLaunchGame;
 
     private List<Image> playerSprites = new List<Image>();
+    private List<Text> playerNumbers = new List<Text>();
 
     private const float TIMETOLAUNCHGAME = 1.5f;
 
     private void Start()
     {
         playerSprites.Add(playerSprite);
+        playerNumbers.Add(playerNumber);
     }
 
     void Update()
@@ -72,6 +77,8 @@ public class Menu_PlayerSelection : MonoBehaviour
     {
         int index = GameManager.instance.GetCurrentPlayerNumber();
         playerSprites.Add(Instantiate(playerSprite, Root_PlayerSprites));
+        playerNumbers.Add(Instantiate(playerNumber, Root_PlayerSprites));
+        playerNumbers[index - 1].text = $"Player {index}";
         playerSprites[index].color = playerSpriteColorsSelection[index-1];
     }
 }
