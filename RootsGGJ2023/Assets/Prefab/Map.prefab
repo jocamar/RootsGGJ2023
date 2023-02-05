@@ -8683,8 +8683,6 @@ Transform:
   - {fileID: 1434554394153006535}
   - {fileID: 6991417599490212937}
   - {fileID: 937159057653758688}
-  - {fileID: 3727173964661500732}
-  - {fileID: 7064558459666220282}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -12305,6 +12303,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+<<<<<<< HEAD
 --- !u!1001 &1104185416267805931
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -13099,3 +13098,5 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1180450626824710676, guid: 6356c9239f7c0744eb3b09b5d45496e5, type: 3}
   m_PrefabInstance: {fileID: 8244850576083709678}
   m_PrefabAsset: {fileID: 0}
+=======
+>>>>>>> main
