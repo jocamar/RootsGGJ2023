@@ -105,6 +105,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 03be4313-c50d-46f7-8ad4-5b5e55e98efb
     m_ActionName: Inputs_Player/Sabotage[/DualShock4GamepadHID/buttonNorth,/XInputControllerWindows/buttonNorth,/XInputControllerWindows/buttonNorth,/XInputControllerWindows/buttonNorth,/DualShock4GamepadHID/buttonWest,/XInputControllerWindows/buttonWest,/XInputControllerWindows/buttonWest,/XInputControllerWindows/buttonWest,/DualShock4GamepadHID/buttonEast,/XInputControllerWindows/buttonEast,/XInputControllerWindows/buttonEast,/XInputControllerWindows/buttonEast]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 7206634111523251183}
+        m_TargetAssemblyTypeName: PlayerInputs, Assembly-CSharp
+        m_MethodName: PlayerVFX
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 11e47b7a-c0be-4d7b-8d8a-8886ab3a92d3
+    m_ActionName: Inputs_Player/FlyingVFX[/DualShock4GamepadHID/leftStick,/XInputControllerWindows/leftStick,/XInputControllerWindows/leftStick,/XInputControllerWindows/leftStick]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Inputs_Player
@@ -125,7 +141,9 @@ MonoBehaviour:
   playerSelect: 0
   playerSelect_Down: 1
   playerSabotage: 0
-  playerSabotage_Down: 0
+  playerSabotage_Down: 1
   movementReset: 1
-  playerInput: {fileID: 0}
-  movementOutput: {x: 1, y: 0}
+  playerInput: {fileID: 1711849268070526824}
+  movementOutput: {x: 0, y: 1}
+  vfxTemplate: {fileID: 1866223618516581701, guid: 1384804ff3b419442bcb7bd7950f0ea0, type: 3}
+  particleFloatSpeedMultiplier: 10

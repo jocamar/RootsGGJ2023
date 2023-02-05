@@ -7,8 +7,11 @@ public class DisableMouseInput : MonoBehaviour
 {
     private void Awake()
     {
-        InputSystem.DisableDevice(InputSystem.GetDevice<Mouse>());
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        if (!Application.isEditor)
+        {
+            InputSystem.DisableDevice(InputSystem.GetDevice<Mouse>());
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
     }
 }
