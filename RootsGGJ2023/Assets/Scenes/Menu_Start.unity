@@ -1076,10 +1076,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e16dc0ca39e44b74385e08d0ae3b8f94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timeToGrow: 5
+  timeToGrow: 3
   refreshRate: 0.05
-  minGrow: 0.2
-  maxGrow: 0.97
+  minGrow: 0
+  maxGrow: 1
 --- !u!1 &1648980333
 GameObject:
   m_ObjectHideFlags: 0
@@ -1239,6 +1239,10 @@ PrefabInstance:
     - target: {fileID: 4365897869221445620, guid: 8d871f190af621e4ebad800edd3fcc0e, type: 3}
       propertyPath: ShapeModule.m_Scale.y
       value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 4365897869221445620, guid: 8d871f190af621e4ebad800edd3fcc0e, type: 3}
+      propertyPath: ShapeModule.radiusThickness
+      value: 1.0000
       objectReference: {fileID: 0}
     - target: {fileID: 4365897869221445620, guid: 8d871f190af621e4ebad800edd3fcc0e, type: 3}
       propertyPath: InitialModule.startSize.minScalar
@@ -1541,6 +1545,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1951204294558462809, guid: 01b3c2f6fc5e3004e995b3871275c42e, type: 3}
+      propertyPath: growVine
+      value: 
+      objectReference: {fileID: 1634666006}
     - target: {fileID: 1951204294558462814, guid: 01b3c2f6fc5e3004e995b3871275c42e, type: 3}
       propertyPath: m_RootOrder
       value: 2

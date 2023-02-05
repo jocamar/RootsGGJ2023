@@ -34,22 +34,17 @@ public class GrowVineScript : MonoBehaviour
                 }
             }
         }
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        if(Input.GetKeyDown(KeyCode.Space))
+        for (int i = 0; i < growVinesMaterials.Count; i++)
         {
-            for(int i=0;i<growVinesMaterials.Count; i++)
-            {
-                StartCoroutine(GrowVines(growVinesMaterials[i]));
-            }
+            Debug.Log("Patrick");
+            StartCoroutine(GrowVines(growVinesMaterials[i]));
         }
     }
 
     IEnumerator GrowVines (Material mat)
     {
+        Debug.Log("Antoine");
         float growValue = mat.GetFloat("Grow_");
 
         if(!fullyGrown)
@@ -77,5 +72,7 @@ public class GrowVineScript : MonoBehaviour
             fullyGrown = true;
         else
             fullyGrown = false;
+
+        yield break;
     }
 }
