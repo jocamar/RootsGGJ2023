@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: a58da7ca4ef771c42b0aaadb70961bcf
+guid: 7c7b1a5a303b1a04390a3385cc5e6081
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -11,7 +11,7 @@ TrueTypeFontImporter:
   fontNames:
   - BigNoodleTitling
   fallbackFontReferences:
-  - {fileID: 12800000, guid: e3d5502869226bf4b86e85caf93b6364, type: 3}
+  - {fileID: 12800000, guid: 1ac45474b9cb9be45a2c11ad86e31212, type: 3}
   customCharacters: 
   fontRenderingMode: 0
   ascentCalculationMode: 1

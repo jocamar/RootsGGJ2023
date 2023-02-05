@@ -36,6 +36,16 @@ public class GameManager : MonoBehaviour
     public GameObject mapPrefab;
     public GameObject PlayerMessage;
 
+    public GameObject P1OpenAudio;
+    public GameObject P2OpenAudio;
+    public GameObject P3OpenAudio;
+    public GameObject P4OpenAudio;
+    public GameObject P1CloseAudio;
+    public GameObject P2CloseAudio;
+    public GameObject P3CloseAudio;
+    public GameObject P4CloseAudio;
+    public GameObject AllOpen;
+
     List<Player> players = new List<Player>();
     GameState currentGameState = GameState.STARTMENU;
     float currentWaitTime = 0f;
@@ -54,6 +64,8 @@ public class GameManager : MonoBehaviour
 
     public string CloseingEyes;
     public string ImpostorDisplay;
+    public string Discuss;
+    public int discussionTimer;
     TextMeshProUGUI PlayerMessage_text;
     TextMeshProUGUI PlayerNutrients_text;
 
@@ -68,6 +80,9 @@ public class GameManager : MonoBehaviour
     int currBlockedPlayer = -1;
 
     float mapTileScale = 0.5f;
+
+    Player.MoveDirections lastMoveDirection = Player.MoveDirections.NONE;
+    GameObject lastRootTile = null;
 
     public static GameManager instance;
     private void Awake()
@@ -97,6 +112,7 @@ public class GameManager : MonoBehaviour
 
     public void StartGame()
     {
+        lastMoveDirection = Player.MoveDirections.NONE;
         currentGameState = GameState.SELECTING_SABOTEUR;
         GameManagerUI.SetActive(true);
     }
@@ -135,6 +151,8 @@ public class GameManager : MonoBehaviour
         totalMoves = 30;
         Destroy(mapObject);
         currBlockedPlayer = -1;
+        lastMoveDirection = Player.MoveDirections.NONE;
+        lastRootTile = null;
     }
 
     public int GetCurrentPlayerNumber()
@@ -147,17 +165,17 @@ public class GameManager : MonoBehaviour
         return players.Find(x => x.playerInputs == playerInputs) != null;
     }
 
-    public void AddNewPlayer(PlayerInputs playerInput)
+    public void AddNewPlayer(PlayerInputs playerInput, Color color)
     {
-        Player newPlayer = new Player(playerInput, players.Count + 1, false, false);
+        Player newPlayer = new Player(playerInput, players.Count + 1, false, false, color);
         players.Add(newPlayer);
 
-        PlayerSelected(newPlayer.playerIndex);
+        PlayerSelected(newPlayer.playerIndex, color);
     }
 
-    private void PlayerSelected(int playerNumber)
+    private void PlayerSelected(int playerNumber, Color color)
     {
-        Debug.Log("Player " + playerNumber + " Selected!");
+        Debug.Log($"Player {playerNumber} Selected!, he is color {color}");
     }
 
     // Update is called once per frame
@@ -174,29 +192,43 @@ public class GameManager : MonoBehaviour
                 PlayerMessage_text.text = CloseingEyes;
                 startingSaboteurSelect = false;
                 randomImpostor = Random.Range(0, 4);
-                currentWaitTime = 1.0f;
+                currentWaitTime = 5.0f;
             }
 
             currentWaitTime -= Time.deltaTime;
 
             if (currentWaitTime <= 0.0f)
             {
-                Debug.Log("Player " + (currentSaboteurSelectionPlayer + 1) + " Open your eyes!");
-
-                if (currentSaboteurSelectionPlayer == randomImpostor)
-                {
-                    Debug.Log("You are the impostor!");
-                    PlayerMessage_text.text = ImpostorDisplay;
-                    Player player = players[playerOrder[currentGameplayPlayer]];
-                    player.isSaboteur = true;
-                }
-                currentSaboteurSelectionPlayer++;
-                currentWaitTime = 1.0f;
-
                 if (currentSaboteurSelectionPlayer >= players.Count)
                 {
+                    AllOpen.GetComponent<AudioSource>().Play();
                     currentGameState = GameState.GAMEPLAY;
                     PlayerNutrients_text.text = "" + totalMoves;
+                }
+                else
+                {
+                    GameObject[] audiosOpen = { P1OpenAudio, P2OpenAudio, P3OpenAudio, P4OpenAudio };
+                    GameObject[] audiosClose = { P1CloseAudio, P2CloseAudio, P3CloseAudio, P4CloseAudio };
+
+                    Debug.Log("Player " + (currentSaboteurSelectionPlayer + 1) + " Open your eyes!");
+                    audiosOpen[currentSaboteurSelectionPlayer].GetComponent<AudioSource>().Play();
+                    if (currentSaboteurSelectionPlayer + 1 < players.Count)
+                        audiosClose[currentSaboteurSelectionPlayer].GetComponent<AudioSource>().PlayDelayed(3.0f);
+
+                    if (currentSaboteurSelectionPlayer == randomImpostor)
+                    {
+                        Debug.Log("You are the impostor!");
+                        PlayerMessage_text.text = ImpostorDisplay;
+                        Player player = players[randomImpostor];
+                        player.isSaboteur = true;
+                    }
+                    else
+                    {
+                        PlayerMessage_text.text = "You are not the impostor! :)";
+                        Debug.Log("You are not the impostor!");
+                    }
+                    currentSaboteurSelectionPlayer++;
+                    currentWaitTime = 6.0f;
                 }
             }
         }
@@ -294,31 +326,6 @@ public class GameManager : MonoBehaviour
                         };
 
                         if (moveDirection != Player.MoveDirections.NONE) player.movesForCurrentRound.Add(moveDirection);
-                        if (player.isDisrupt == true)
-                        {
-                            int moveCount = player.movesForCurrentRound.Count;
-                            int replacedMove = Random.Range(0, moveCount);
-                            int randomMove = Random.Range(0, 3);
-                            switch (randomMove)
-                            {
-                                case 0:
-                                    player.movesForCurrentRound.RemoveAt(replacedMove);
-                                    player.movesForCurrentRound.Insert(replacedMove, Player.MoveDirections.UP);
-                                    break;
-                                case 1:
-                                    player.movesForCurrentRound.RemoveAt(replacedMove);
-                                    player.movesForCurrentRound.Insert(replacedMove, Player.MoveDirections.DOWN);
-                                    break;
-                                case 2:
-                                    player.movesForCurrentRound.RemoveAt(replacedMove);
-                                    player.movesForCurrentRound.Insert(replacedMove, Player.MoveDirections.LEFT);
-                                    break;
-                                case 3:
-                                    player.movesForCurrentRound.RemoveAt(replacedMove);
-                                    player.movesForCurrentRound.Insert(replacedMove, Player.MoveDirections.RIGHT);
-                                    break;
-                            }
-                        }
                     }
                 }
 
@@ -348,20 +355,74 @@ public class GameManager : MonoBehaviour
                     }
                 }
             }
+        if (currentGameState == GameState.DISCUSSION)
+        {
+
         }
+    }
         else if (currentGameState == GameState.PATH_REVEAL)
         {
             List<Player.MoveDirections> completePath = new List<Player.MoveDirections>();
+            Player.MoveDirections tentativeLastMoveDir = Player.MoveDirections.NONE;
             foreach (int i in playerOrder)
             {
+                if (players[i].movesForCurrentRound.Count <= 0)
+                    continue;
+
+                if (players[i].isDisrupt == true)
+                {
+                    int moveCount = players[i].movesForCurrentRound.Count;
+                    int replacedMove = Random.Range(0, moveCount);
+
+                    Player.MoveDirections blockedDirection = tentativeLastMoveDir != Player.MoveDirections.NONE ? tentativeLastMoveDir : lastMoveDirection;
+
+
+                    int randomMove;
+
+                    do
+                    {
+                        randomMove = Random.Range(0, 3);
+                    }
+                    while (randomMove == (int)blockedDirection);
+
+                    switch (randomMove)
+                    {
+                        case 0:
+                            players[i].movesForCurrentRound.RemoveAt(replacedMove);
+                            players[i].movesForCurrentRound.Insert(replacedMove, Player.MoveDirections.UP);
+                            break;
+                        case 1:
+                            players[i].movesForCurrentRound.RemoveAt(replacedMove);
+                            players[i].movesForCurrentRound.Insert(replacedMove, Player.MoveDirections.DOWN);
+                            break;
+                        case 2:
+                            players[i].movesForCurrentRound.RemoveAt(replacedMove);
+                            players[i].movesForCurrentRound.Insert(replacedMove, Player.MoveDirections.LEFT);
+                            break;
+                        case 3:
+                            players[i].movesForCurrentRound.RemoveAt(replacedMove);
+                            players[i].movesForCurrentRound.Insert(replacedMove, Player.MoveDirections.RIGHT);
+                            break;
+                    }
+                }
+
+                tentativeLastMoveDir = players[i].movesForCurrentRound[players[i].movesForCurrentRound.Count - 1];
                 completePath.AddRange(players[i].movesForCurrentRound);
             }
 
             foreach (GameObject obj in Player_UIs)
                 obj.GetComponent<PlayerInGameUI>().StopBlock();
 
-            foreach (Player.MoveDirections dir in completePath)
+            for (int i = 0; i < completePath.Count; i++)
             {
+                Player.MoveDirections dir = completePath[i];
+                Player.MoveDirections dirAfter = i < completePath.Count - 1 ? completePath[i + 1] : Player.MoveDirections.NONE;
+
+                if (i == 0 && lastRootTile != null)
+                {
+                    lastRootTile.GetComponent<RootSpriteController>().ChangeNextDir(dir);
+                }
+
                 int newX = currentPositionX;
                 int newY = currentPositionY;
                 if (dir == Player.MoveDirections.DOWN)
@@ -385,6 +446,7 @@ public class GameManager : MonoBehaviour
                 {
                     if (map.GetTile(newX, newY).type == Map.TileType.Empty)
                     {
+                        lastMoveDirection = dir;
                         currentPositionX = newX;
                         currentPositionY = newY;
                         Map.Tile newTile = new Map.Tile();
@@ -392,7 +454,11 @@ public class GameManager : MonoBehaviour
                         map.SetTile(currentPositionX, currentPositionY, newTile);
 
                         var newObj = Instantiate(rootTile, new Vector3(originX + currentPositionX * mapTileScale, originY + currentPositionY * mapTileScale), Quaternion.identity);
+                        newObj.GetComponent<RootSpriteController>().SetMoveDirections(dir, dirAfter);
                         map.SetObject(currentPositionX, currentPositionY, newObj);
+
+                        if (dirAfter == Player.MoveDirections.NONE)
+                            lastRootTile = newObj;
                     }
                     else if (map.GetTile(newX, newY).type == Map.TileType.End)
                     {
