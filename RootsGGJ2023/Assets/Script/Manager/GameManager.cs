@@ -532,6 +532,7 @@ public class GameManager : MonoBehaviour
                 {
                     currentGameState = GameState.VOTING;
                 }
+            }
         }
         else if (currentGameState == GameState.VOTING)
         {
