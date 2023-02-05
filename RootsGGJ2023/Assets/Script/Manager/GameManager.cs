@@ -34,6 +34,7 @@ public class GameManager : MonoBehaviour
     public GameObject rootTile;
     public GameObject endTile;
     public GameObject mapPrefab;
+    public GameObject PlayerMessage;
 
     List<Player> players = new List<Player>();
     GameState currentGameState = GameState.STARTMENU;
@@ -149,7 +150,7 @@ public class GameManager : MonoBehaviour
 
     public void AddNewPlayer(PlayerInputs playerInput)
     {
-        Player newPlayer = new Player(playerInput, players.Count + 1);
+        Player newPlayer = new Player(playerInput, players.Count + 1, false, false);
         players.Add(newPlayer);
 
         PlayerSelected(newPlayer.playerIndex);
@@ -182,10 +183,14 @@ public class GameManager : MonoBehaviour
             if (currentWaitTime <= 0.0f)
             {
                 Debug.Log("Player " + (currentSaboteurSelectionPlayer + 1) + " Open your eyes!");
-                
+
                 if (currentSaboteurSelectionPlayer == randomImpostor)
+                {
                     Debug.Log("You are the impostor!");
-                PlayerMessage_text.text = ImpostorDisplay;
+                    PlayerMessage_text.text = ImpostorDisplay;
+                    Player player = players[playerOrder[currentGameplayPlayer]];
+                    player.isSaboteur = true;
+                }
                 currentSaboteurSelectionPlayer++;
                 currentWaitTime = 1.0f;
 
@@ -289,8 +294,32 @@ public class GameManager : MonoBehaviour
                             _ => Player.MoveDirections.NONE,
                         };
 
-                        if (moveDirection != Player.MoveDirections.NONE) player.movesForCurrentRound.Add(moveDirection);
+                    if (moveDirection != Player.MoveDirections.NONE) player.movesForCurrentRound.Add(moveDirection);
+                    if (player.isDisrupt == true)
+                {
+                    int moveCount = player.movesForCurrentRound.Count;
+                    int replacedMove = Random.Range(0, moveCount);
+                    int randomMove = Random.Range(0, 3);
+                    switch (randomMove) {
+                        case 0:
+                            player.movesForCurrentRound.RemoveAt(replacedMove);
+                            player.movesForCurrentRound.Insert (replacedMove, Player.MoveDirections.UP);
+                                break;
+                        case 1:
+                            player.movesForCurrentRound.RemoveAt(replacedMove);
+                            player.movesForCurrentRound.Insert(replacedMove, Player.MoveDirections.DOWN);
+                                break;
+                        case 2:
+                            player.movesForCurrentRound.RemoveAt(replacedMove);
+                            player.movesForCurrentRound.Insert(replacedMove, Player.MoveDirections.LEFT);
+                                break;
+                        case 3:
+                            player.movesForCurrentRound.RemoveAt(replacedMove);
+                            player.movesForCurrentRound.Insert(replacedMove, Player.MoveDirections.RIGHT);
+                                break;
                     }
+
+                }
                 }
 
                 if ((players[playerOrder[currentGameplayPlayer]].playerInputs.playerSelect_Down && players[playerOrder[currentGameplayPlayer]].movesForCurrentRound.Count >= 1)
