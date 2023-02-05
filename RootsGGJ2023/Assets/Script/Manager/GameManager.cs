@@ -320,9 +320,8 @@ public class GameManager : MonoBehaviour
                     {
                         if (movement.action.triggered)
                         {
-                            Debug.Log("Triggered move for player " + playerOrder[currentGameplayPlayer] + "!");
-
                             Player player = players[playerOrder[currentGameplayPlayer]];
+
                             Player.MoveDirections moveDirection = player.playerInputs.movementOutput switch
                             {
                                 Vector2 v when v.Equals(Vector2.up) => Player.MoveDirections.UP,
@@ -332,7 +331,10 @@ public class GameManager : MonoBehaviour
                                 _ => Player.MoveDirections.NONE,
                             };
 
+                            Debug.Log(moveDirection);
+
                             if (moveDirection != Player.MoveDirections.NONE) player.movesForCurrentRound.Add(moveDirection);
+
                         }
                     }
 
@@ -373,7 +375,7 @@ public class GameManager : MonoBehaviour
                     }
                 }
 
-                if (!saboteurHasUsedDisrupt && players[randomImpostor].playerInputs.playerSabotage_Down)
+                if (!saboteurHasUsedDisrupt && randomImpostor < players.Count && players[randomImpostor].playerInputs.playerSabotage_Down)
                 {
                     players[playerOrder[currentGameplayPlayer]].isDisrupt = true;
                     saboteurHasUsedDisrupt = true;
